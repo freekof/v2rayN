@@ -1109,6 +1109,70 @@ public static class ConfigHandler
     }
 
     /// <summary>
+/// 解析HTTP/HTTPS代理URL
+/// </summary>
+private static ProfileItem? ParseHttpProxyUrl(string url)
+{
+    try
+    {
+        // 检查协议
+        if (!url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
+            !url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+        {
+            return null;
+        }
+
+        // 避免订阅URL
+        if (url.Contains("/sub", StringComparison.OrdinalIgnoreCase) ||
+            url.Contains("subscription", StringComparison.OrdinalIgnoreCase))
+        {
+            return null;
+        }
+
+        var uri = new Uri(url);
+        var isHttps = uri.Scheme.Equals("https", StringComparison.OrdinalIgnoreCase);
+
+        var item = new ProfileItem
+        {
+            ConfigType = EConfigType.HTTP,
+            Address = uri.Host,
+            Port = uri.Port > 0 ? uri.Port : (isHttps ? 443 : 8080),
+            Remarks = $"{uri.Scheme.ToUpper()}-{uri.Host}:{(uri.Port > 0 ? uri.Port : (isHttps ? 443 : 8080))}"
+        };
+
+        // HTTPS配置TLS
+        if (isHttps)
+        {
+            item.StreamSecurity = "tls";
+            item.Sni = uri.Host;
+        }
+
+        // 解析认证
+        if (!string.IsNullOrEmpty(uri.UserInfo))
+        {
+            var credentials = uri.UserInfo.Split(new[] { ':' }, 2);
+            if (credentials.Length > 0)
+            {
+                item.Security = "basic";
+                item.Id = Uri.UnescapeDataString(credentials[0]);
+
+                if (credentials.Length > 1)
+                {
+                    item.AlterId = Uri.UnescapeDataString(credentials[1]);
+                }
+            }
+        }
+
+        return item;
+    }
+    catch (Exception ex)
+    {
+        Logging.SaveLog("ParseHttpProxyUrl", ex);
+        return null;
+    }
+}
+    
+    /// <summary>
     /// Compare two profile items to determine if they represent the same server
     /// Used for deduplication and server matching
     /// </summary>
@@ -1346,18 +1410,41 @@ public static class ConfigHandler
         {
             arrData = arrData.Distinct();
         }
+
         foreach (var str in arrData)
+{
+    // ===== 新增：先尝试解析HTTP/HTTPS代理 =====
+    if (str.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+        str.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+    {
+        // 尝试作为HTTP代理解析
+        var httpProxy = ParseHttpProxyUrl(str);
+        if (httpProxy != null)
         {
-            //maybe sub
-            if (!isSub && (str.StartsWith(Global.HttpsProtocol) || str.StartsWith(Global.HttpProtocol)))
+            httpProxy.Subid = subid;
+            httpProxy.IsSub = isSub;
+            
+            if (await AddHttpServer(config, httpProxy, false) == 0)
             {
-                if (await AddSubItem(config, str) == 0)
-                {
-                    countServers++;
-                }
-                continue;
+                countServers++;
+                lstAdd.Add(httpProxy);
             }
-            var profileItem = FmtHandler.ResolveConfig(str, out var msg);
+            continue;
+        }
+        
+        // 如果不是HTTP代理格式，当作订阅处理（原有逻辑）
+        if (!isSub)
+        {
+            if (await AddSubItem(config, str) == 0)
+            {
+                countServers++;
+            }
+            continue;
+        }
+    }
+    // ===== HTTP/HTTPS处理结束 =====
+    
+    var profileItem = FmtHandler.ResolveConfig(str, out var msg);
             if (profileItem is null)
             {
                 continue;
