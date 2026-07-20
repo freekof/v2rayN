@@ -108,6 +108,22 @@ public class FmtHandlerTests
         resolved.Remarks.Should().Be("ipv6");
     }
 
+    [Fact]
+    public void ResolveConfig_HttpsSubscriptionPath_ShouldReturnNull()
+    {
+        var resolved = FmtHandler.ResolveConfig("https://example.com/sub?token=x", out _);
+
+        resolved.Should().BeNull();
+    }
+
+    [Fact]
+    public void ResolveConfig_HttpsSubscriptionQueryWithoutPath_ShouldReturnNull()
+    {
+        var resolved = FmtHandler.ResolveConfig("https://example.com?token=x", out _);
+
+        resolved.Should().BeNull();
+    }
+
     [Theory]
     [InlineData(false)]
     [InlineData(true)]

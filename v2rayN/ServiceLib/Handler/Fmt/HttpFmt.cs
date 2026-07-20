@@ -10,7 +10,9 @@ public class HttpFmt : BaseFmt
         if (uri == null
             || (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps)
             || uri.IdnHost.IsNullOrEmpty()
-            || uri.Port <= 0)
+            || uri.Port <= 0
+            || uri.AbsolutePath is not ("" or "/")
+            || uri.Query.IsNotEmpty())
         {
             return null;
         }
