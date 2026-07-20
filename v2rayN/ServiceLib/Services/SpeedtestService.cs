@@ -96,6 +96,7 @@ public class SpeedtestService(Config config, Func<SpeedTestResult, Task> updateF
                 Address = it.Address,
                 Port = it.Port,
                 ConfigType = it.ConfigType,
+                NeedAutoFillRemarks = profile.Remarks.IsNullOrEmpty(),
                 QueueNum = i,
                 Profile = profile,
                 CoreType = AppManager.Instance.GetCoreType(profile, it.ConfigType),
@@ -425,6 +426,11 @@ public class SpeedtestService(Config config, Func<SpeedTestResult, Task> updateF
         ProfileExManager.Instance.SetTestDelay(it.IndexId, responseTime);
         await UpdateFunc(it.IndexId, responseTime.ToString());
 
+        if (responseTime > 0 && it.NeedAutoFillRemarks)
+        {
+            await TryAutoFillRemarks(it, webProxy);
+        }
+
         if (!_config.UiItem.HideColumnIpInfo && responseTime > 0)
         {
             var ipInfo = await ConnectionHandler.GetIPInfo(webProxy);
@@ -438,6 +444,41 @@ public class SpeedtestService(Config config, Func<SpeedTestResult, Task> updateF
         }
 
         return responseTime;
+    }
+
+    private async Task TryAutoFillRemarks(ServerTestItem it, IWebProxy webProxy)
+    {
+        try
+        {
+            if (!it.NeedAutoFillRemarks || it.IndexId.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            var remarks = await ConnectionHandler.GetCountryCodeAndIP(webProxy, 8);
+            if (remarks.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            var profileItem = await AppManager.Instance.GetProfileItem(it.IndexId);
+            if (profileItem == null || profileItem.Remarks.IsNotEmpty())
+            {
+                it.NeedAutoFillRemarks = false;
+                return;
+            }
+
+            profileItem.Remarks = remarks;
+            if (await SQLiteHelper.Instance.UpdateAsync(profileItem) > 0)
+            {
+                it.NeedAutoFillRemarks = false;
+                await UpdateRemarksFunc(it.IndexId, remarks);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logging.SaveLog(_tag, ex);
+        }
     }
 
     private async Task DoSpeedTest(DownloadService downloadHandle, ServerTestItem it)
@@ -536,5 +577,10 @@ public class SpeedtestService(Config config, Func<SpeedTestResult, Task> updateF
     private async Task UpdateIpInfoFunc(string indexId, string ip)
     {
         await _updateFunc?.Invoke(new() { IndexId = indexId, IpInfo = ip });
+    }
+
+    private async Task UpdateRemarksFunc(string indexId, string remarks)
+    {
+        await _updateFunc?.Invoke(new() { IndexId = indexId, Remarks = remarks });
     }
 }

@@ -302,6 +302,10 @@ public class ProfilesViewModel : MyReactiveObject
         {
             item.IpInfo = result.IpInfo ?? string.Empty;
         }
+        if (result.Remarks.IsNotEmpty())
+        {
+            item.Remarks = result.Remarks ?? string.Empty;
+        }
         await Task.CompletedTask;
     }
 

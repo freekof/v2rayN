@@ -3,6 +3,11 @@ namespace ServiceLib.Handler;
 public static class ConnectionHandler
 {
     private static readonly string _tag = "ConnectionHandler";
+    private static readonly string[] _speedtestIpApiUrls =
+    [
+        "https://www.cloudflare.com/cdn-cgi/trace",
+        "https://api.ipapi.is"
+    ];
 
     /// <summary>
     /// Runs ping and IP checks and returns a formatted result string.
@@ -118,16 +123,52 @@ public static class ConnectionHandler
                 return null;
             }
 
-            var ipInfo = JsonUtils.Deserialize<IPAPIInfo>(result);
-            if (ipInfo == null)
+            return IpInfoResult.ParseJson(result);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public static async Task<string?> GetCountryCodeAndIP(IWebProxy? webProxy, int downloadTimeout = 10)
+    {
+        foreach (var url in _speedtestIpApiUrls)
+        {
+            var ipInfo = await GetIpApiInfo(url, webProxy, downloadTimeout);
+            var remarks = ipInfo?.ToCompactString(requireAsn: true);
+            if (remarks.IsNotEmpty())
+            {
+                return remarks;
+            }
+        }
+
+        return null;
+    }
+
+    private static async Task<IpInfoResult?> GetIpApiInfo(string url, IWebProxy? webProxy, int downloadTimeout)
+    {
+        try
+        {
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(downloadTimeout));
+            using var client = new HttpClient(new SocketsHttpHandler
+            {
+                Proxy = webProxy,
+                UseProxy = webProxy != null,
+                ConnectTimeout = TimeSpan.FromSeconds(3)
+            });
+            client.DefaultRequestHeaders.UserAgent.TryParseAdd(Utils.GetVersion(false));
+
+            using var response = await client.GetAsync(url, cts.Token).ConfigureAwait(false);
+            if (!response.IsSuccessStatusCode)
             {
                 return null;
             }
 
-            var ip = ipInfo.ip ?? ipInfo.clientIp ?? ipInfo.ip_addr ?? ipInfo.query;
-            var country = ipInfo.country_code ?? ipInfo.country ?? ipInfo.countryCode ?? ipInfo.location?.country_code ?? "unknown";
-
-            return new IpInfoResult(country, ip);
+            var content = await response.Content.ReadAsStringAsync(cts.Token).ConfigureAwait(false);
+            return url.Contains("/cdn-cgi/trace", StringComparison.OrdinalIgnoreCase)
+                ? IpInfoResult.ParseCloudflareTrace(content)
+                : IpInfoResult.ParseJson(content);
         }
         catch
         {

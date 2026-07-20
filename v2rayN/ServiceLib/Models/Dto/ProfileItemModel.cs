@@ -6,6 +6,7 @@ public class ProfileItemModel : ReactiveObject
     public bool IsActive { get; set; }
     public string IndexId { get; set; }
     public EConfigType ConfigType { get; set; }
+    [Reactive]
     public string Remarks { get; set; }
     public string Address { get; set; }
     public int Port { get; set; }

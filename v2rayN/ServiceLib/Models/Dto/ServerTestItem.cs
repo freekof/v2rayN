@@ -8,6 +8,7 @@ public class ServerTestItem
     public int Port { get; set; }
     public EConfigType ConfigType { get; set; }
     public bool AllowTest { get; set; }
+    public bool NeedAutoFillRemarks { get; set; }
     public int QueueNum { get; set; }
     public ProfileItem Profile { get; set; }
     public ECoreType CoreType { get; set; }
