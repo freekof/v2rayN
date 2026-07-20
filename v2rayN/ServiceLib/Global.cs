@@ -233,6 +233,7 @@ public class Global
         { EConfigType.VMess, "vmess://" },
         { EConfigType.Shadowsocks, "ss://" },
         { EConfigType.SOCKS, "socks://" },
+        { EConfigType.HTTP, "http://" },
         { EConfigType.VLESS, "vless://" },
         { EConfigType.Trojan, "trojan://" },
         { EConfigType.Hysteria2, "hysteria2://" },

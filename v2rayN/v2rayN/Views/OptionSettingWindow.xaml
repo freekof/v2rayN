@@ -1362,6 +1362,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -1482,6 +1483,21 @@
                     <ComboBox
                         x:Name="cmbCoreType9"
                         Grid.Row="8"
+                        Grid.Column="1"
+                        Width="200"
+                        Margin="{StaticResource Margin8}"
+                        Style="{StaticResource DefComboBox}" />
+
+                    <TextBlock
+                        Grid.Row="9"
+                        Grid.Column="0"
+                        Margin="{StaticResource Margin8}"
+                        VerticalAlignment="Center"
+                        Style="{StaticResource ToolbarTextBlock}"
+                        Text="HTTP/HTTPS" />
+                    <ComboBox
+                        x:Name="cmbCoreType10"
+                        Grid.Row="9"
                         Grid.Column="1"
                         Width="200"
                         Margin="{StaticResource Margin8}"
