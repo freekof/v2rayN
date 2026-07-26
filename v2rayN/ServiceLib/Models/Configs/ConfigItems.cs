@@ -103,7 +103,7 @@ public class UIItem
     public bool MacOSShowInDock { get; set; }
     public List<ColumnItem> MainColumnItem { get; set; }
     public List<WindowSizeItem> WindowSizeItem { get; set; }
-    public bool HideColumnIpInfo { get; set; }
+    public bool HideColumnIpInfo { get; set; } = true;
 }
 
 [Serializable]
