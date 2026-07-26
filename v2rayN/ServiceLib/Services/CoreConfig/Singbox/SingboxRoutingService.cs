@@ -43,6 +43,24 @@ public partial class CoreConfigSingboxService
                     _coreConfig.route.rules.AddRange(tunRules);
                 }
 
+                if (_config.TunModeItem.EnableWebRTCStunProxy)
+                {
+                    _coreConfig.route.rules.Add(new()
+                    {
+                        inbound = ["tun"],
+                        network = ["udp"],
+                        action = "sniff",
+                    });
+
+                    _coreConfig.route.rules.Add(new()
+                    {
+                        inbound = ["tun"],
+                        network = ["udp"],
+                        protocol = ["stun"],
+                        outbound = Global.WebRTCStunRelayTag,
+                    });
+                }
+
                 var lstDirectExe = BuildRoutingDirectExe();
                 if (lstDirectExe.Count > 0)
                 {

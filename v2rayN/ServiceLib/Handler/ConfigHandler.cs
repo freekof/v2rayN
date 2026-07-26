@@ -90,10 +90,13 @@ public static class ConfigHandler
         config.TunModeItem ??= new TunModeItem
         {
             EnableTun = false,
+            EnableWebRTCStunProxy = false,
+            WebRTCStunProxyIP = string.Empty,
             Mtu = 9000,
             IcmpRouting = Global.TunIcmpRoutingPolicies.First(),
             EnableLegacyProtect = false,
         };
+        config.TunModeItem.WebRTCStunProxyIP ??= string.Empty;
         config.GuiItem ??= new();
         if (!Global.RootCertProviders.Contains(config.GuiItem.RootCertProvider))
         {
@@ -1510,7 +1513,8 @@ public static class ConfigHandler
     public static ProfileItem? GetPreSocksItem(Config config, ProfileItem node, ECoreType coreType)
     {
         ProfileItem? itemSocks = null;
-        var enableLegacyProtect = config.TunModeItem.EnableLegacyProtect;
+        // WebRTC STUN relay requires TUN to be handled by sing-box, which is what legacy protect does.
+        var enableLegacyProtect = config.TunModeItem.EnableLegacyProtect || config.TunModeItem.EnableWebRTCStunProxy;
         if (node.ConfigType != EConfigType.Custom
             && coreType != ECoreType.sing_box
             && config.TunModeItem.EnableTun

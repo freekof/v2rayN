@@ -592,4 +592,59 @@ public class CoreConfigSingboxServiceTests
         proxy.realm.stun_servers.Should().Contain("turn.cloudflare.com:3478");
         proxy.server.Should().BeNull();
     }
+
+    [Fact]
+    public void GenerateClientConfigContent_WebRTCStunProxyEnabled_ShouldRouteSniffedStunToLocalRelay()
+    {
+        var config = CoreConfigTestFactory.CreateConfig(ECoreType.sing_box);
+        config.TunModeItem.EnableTun = true;
+        config.TunModeItem.EnableWebRTCStunProxy = true;
+        CoreConfigTestFactory.BindAppManagerConfig(config);
+
+        var node = CoreConfigTestFactory.CreateSocksNode(ECoreType.sing_box, "n-main", "main");
+        var context = CoreConfigTestFactory.CreateContext(config, node, ECoreType.sing_box) with
+        {
+            IsTunEnabled = true,
+        };
+
+        var result = new CoreConfigSingboxService(context).GenerateClientConfigContent();
+
+        result.Success.Should().BeTrue($"ret msg: {result.Msg}");
+        var cfg = JsonUtils.Deserialize<SingboxConfig>(result.Data!.ToString())!;
+
+        cfg.outbounds.Should().Contain(o =>
+            o.tag == Global.WebRTCStunRelayTag
+            && o.type == "socks"
+            && o.server == Global.Loopback
+            && o.server_port == Global.WebRTCStunRelayPort);
+        cfg.route.rules.Should().Contain(r =>
+            r.action == "sniff"
+            && r.inbound != null && r.inbound.Contains("tun")
+            && r.network != null && r.network.Contains("udp"));
+        cfg.route.rules.Should().Contain(r =>
+            r.protocol != null && r.protocol.Contains("stun")
+            && r.inbound != null && r.inbound.Contains("tun")
+            && r.network != null && r.network.Contains("udp")
+            && r.outbound == Global.WebRTCStunRelayTag);
+    }
+
+    [Fact]
+    public void GetPreSocksItem_WebRTCStunProxyEnabledWithTun_ShouldUseSingboxPreCore()
+    {
+        var config = CoreConfigTestFactory.CreateConfig(ECoreType.Xray);
+        config.TunModeItem.EnableTun = true;
+        config.TunModeItem.EnableLegacyProtect = false;
+        config.TunModeItem.EnableWebRTCStunProxy = true;
+        CoreConfigTestFactory.BindAppManagerConfig(config);
+
+        var node = CoreConfigTestFactory.CreateVmessNode(ECoreType.Xray);
+
+        var preSocksItem = ConfigHandler.GetPreSocksItem(config, node, ECoreType.Xray);
+
+        preSocksItem.Should().NotBeNull();
+        preSocksItem!.CoreType.Should().Be(ECoreType.sing_box);
+        preSocksItem.ConfigType.Should().Be(EConfigType.SOCKS);
+        preSocksItem.Address.Should().Be(Global.Loopback);
+        config.TunModeItem.EnableLegacyProtect.Should().BeFalse("persisted user setting must not be rewritten");
+    }
 }

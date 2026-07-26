@@ -141,6 +141,8 @@ public class CoreTypeItem
 public class TunModeItem
 {
     public bool EnableTun { get; set; }
+    public bool EnableWebRTCStunProxy { get; set; }
+    public string WebRTCStunProxyIP { get; set; }
     public bool AutoRoute { get; set; } = true;
     public bool StrictRoute { get; set; } = true;
     public string Stack { get; set; }

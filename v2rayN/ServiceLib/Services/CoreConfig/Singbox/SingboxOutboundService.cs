@@ -6,6 +6,23 @@ public partial class CoreConfigSingboxService
     {
         var proxyOutbounds = BuildAllProxyOutbounds();
         FillRangeProxy(proxyOutbounds, _coreConfig, true);
+        GenWebRTCStunRelayOutbound();
+    }
+
+    private void GenWebRTCStunRelayOutbound()
+    {
+        if (!context.IsTunEnabled || !_config.TunModeItem.EnableWebRTCStunProxy)
+        {
+            return;
+        }
+
+        _coreConfig.outbounds.Add(new Outbound4Sbox
+        {
+            tag = Global.WebRTCStunRelayTag,
+            type = Global.ProtocolTypes[EConfigType.SOCKS],
+            server = Global.Loopback,
+            server_port = Global.WebRTCStunRelayPort,
+        });
     }
 
     private List<BaseServer4Sbox> BuildAllProxyOutbounds(string baseTagName = Global.ProxyTag, bool withSelector = true)

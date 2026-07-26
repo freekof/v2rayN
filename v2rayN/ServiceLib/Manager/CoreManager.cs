@@ -14,6 +14,7 @@ public class CoreManager
 
     private ProcessService? _processService;
     private ProcessService? _processPreService;
+    private StunTcpRelayService? _stunTcpRelayService;
     private bool _linuxSudo = false;
     private Func<bool, string, Task>? _updateFunc;
     private const string _tag = "CoreHandler";
@@ -93,6 +94,7 @@ public class CoreManager
 
         await CoreStart(mainContext);
         await WaitForProxyPort(preContext);
+        await CoreStartWebRTCStunRelayService();
         await CoreStartPreService(preContext);
 
         AppManager.Instance.RunningCoreType = preContext?.RunCoreType ?? mainContext.RunCoreType;
@@ -154,6 +156,8 @@ public class CoreManager
                 _linuxSudo = false;
             }
 
+            await CoreStopWebRTCStunRelayService();
+
             if (_processService != null)
             {
                 await _processService.StopAsync();
@@ -209,6 +213,41 @@ public class CoreManager
                 _processPreService = proc;
             }
         }
+    }
+
+    private async Task CoreStartWebRTCStunRelayService()
+    {
+        if (_processService == null || !_config.TunModeItem.EnableTun || !_config.TunModeItem.EnableWebRTCStunProxy)
+        {
+            return;
+        }
+
+        try
+        {
+            await CoreStopWebRTCStunRelayService();
+            var upstreamSocksPort = AppManager.Instance.GetLocalPort(EInboundProtocol.socks);
+            var mappedAddressProvider = new ProxyPublicIpAddressProvider(Global.Loopback, upstreamSocksPort, _config.TunModeItem.WebRTCStunProxyIP);
+            var stunTcpRelayService = new StunTcpRelayService(mappedAddressProvider);
+            stunTcpRelayService.Start();
+            _stunTcpRelayService = stunTcpRelayService;
+        }
+        catch (Exception ex)
+        {
+            Logging.SaveLog(_tag, ex);
+            await UpdateFunc(false, ex.Message);
+        }
+    }
+
+    private async Task CoreStopWebRTCStunRelayService()
+    {
+        if (_stunTcpRelayService == null)
+        {
+            return;
+        }
+
+        await _stunTcpRelayService.StopAsync();
+        _stunTcpRelayService.Dispose();
+        _stunTcpRelayService = null;
     }
 
     private async Task UpdateFunc(bool notify, string msg)
