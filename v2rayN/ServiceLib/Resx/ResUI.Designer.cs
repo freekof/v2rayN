@@ -232,6 +232,15 @@ namespace ServiceLib.Resx {
         }
         
         /// <summary>
+        ///   查找类似 Please fill in the correct WebRTC STUN manual IP address. 的本地化字符串。
+        /// </summary>
+        public static string FillCorrectWebRTCStunProxyIP {
+            get {
+                return ResourceManager.GetString("FillCorrectWebRTCStunProxyIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Invalid range format. Use &apos;from-to&apos; (e.g., 50-100). 的本地化字符串。
         /// </summary>
         public static string FillFragmentParameterError {
@@ -4722,6 +4731,33 @@ namespace ServiceLib.Resx {
         public static string TbSettingsTunStrictRoute {
             get {
                 return ResourceManager.GetString("TbSettingsTunStrictRoute", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 WebRTC STUN proxy test mode 的本地化字符串。
+        /// </summary>
+        public static string TbSettingsTunWebRTCStunProxy {
+            get {
+                return ResourceManager.GetString("TbSettingsTunWebRTCStunProxy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 WebRTC STUN manual IP 的本地化字符串。
+        /// </summary>
+        public static string TbSettingsTunWebRTCStunProxyIP {
+            get {
+                return ResourceManager.GetString("TbSettingsTunWebRTCStunProxyIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Leave blank to use the detected proxy exit IP 的本地化字符串。
+        /// </summary>
+        public static string TbSettingsTunWebRTCStunProxyIPTip {
+            get {
+                return ResourceManager.GetString("TbSettingsTunWebRTCStunProxyIPTip", resourceCulture);
             }
         }
         

@@ -89,6 +89,8 @@ public class OptionSettingViewModel : MyReactiveObject, ICloseable
 
     [Reactive] public bool TunAutoRoute { get; set; }
     [Reactive] public bool TunStrictRoute { get; set; }
+    [Reactive] public bool TunEnableWebRTCStunProxy { get; set; }
+    [Reactive] public string TunWebRTCStunProxyIP { get; set; }
     [Reactive] public string TunStack { get; set; }
     [Reactive] public int TunMtu { get; set; }
     [Reactive] public bool TunEnableIPv6Address { get; set; }
@@ -209,6 +211,8 @@ public class OptionSettingViewModel : MyReactiveObject, ICloseable
 
         TunAutoRoute = _config.TunModeItem.AutoRoute;
         TunStrictRoute = _config.TunModeItem.StrictRoute;
+        TunEnableWebRTCStunProxy = _config.TunModeItem.EnableWebRTCStunProxy;
+        TunWebRTCStunProxyIP = _config.TunModeItem.WebRTCStunProxyIP ?? string.Empty;
         TunStack = _config.TunModeItem.Stack;
         TunMtu = _config.TunModeItem.Mtu;
         TunEnableIPv6Address = _config.TunModeItem.EnableIPv6Address;
@@ -289,6 +293,12 @@ public class OptionSettingViewModel : MyReactiveObject, ICloseable
            || LocalPort <= 0 || LocalPort >= Global.MaxPort)
         {
             NoticeManager.Instance.Enqueue(ResUI.FillLocalListeningPort);
+            return;
+        }
+        var webRTCStunProxyIP = (TunWebRTCStunProxyIP ?? string.Empty).TrimEx();
+        if (webRTCStunProxyIP.IsNotEmpty() && !IPAddress.TryParse(webRTCStunProxyIP, out _))
+        {
+            NoticeManager.Instance.Enqueue(ResUI.FillCorrectWebRTCStunProxyIP);
             return;
         }
         var fragmentLengths = Utils.String2List(FragmentLengths) ?? [];
@@ -377,6 +387,8 @@ public class OptionSettingViewModel : MyReactiveObject, ICloseable
         //tun mode
         _config.TunModeItem.AutoRoute = TunAutoRoute;
         _config.TunModeItem.StrictRoute = TunStrictRoute;
+        _config.TunModeItem.EnableWebRTCStunProxy = TunEnableWebRTCStunProxy;
+        _config.TunModeItem.WebRTCStunProxyIP = webRTCStunProxyIP;
         _config.TunModeItem.Stack = TunStack;
         _config.TunModeItem.Mtu = TunMtu;
         _config.TunModeItem.EnableIPv6Address = TunEnableIPv6Address;

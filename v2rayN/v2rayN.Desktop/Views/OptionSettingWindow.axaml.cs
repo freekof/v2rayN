@@ -124,6 +124,8 @@ public partial class OptionSettingWindow : WindowBase<OptionSettingViewModel>
 
             this.Bind(ViewModel, vm => vm.TunAutoRoute, v => v.togAutoRoute.IsChecked).DisposeWith(disposables);
             this.Bind(ViewModel, vm => vm.TunStrictRoute, v => v.togStrictRoute.IsChecked).DisposeWith(disposables);
+            this.Bind(ViewModel, vm => vm.TunEnableWebRTCStunProxy, v => v.togEnableWebRTCStunProxy.IsChecked).DisposeWith(disposables);
+            this.Bind(ViewModel, vm => vm.TunWebRTCStunProxyIP, v => v.txtWebRTCStunProxyIP.Text).DisposeWith(disposables);
             this.Bind(ViewModel, vm => vm.TunStack, v => v.cmbStack.SelectedValue).DisposeWith(disposables);
             this.Bind(ViewModel, vm => vm.TunMtu, v => v.cmbMtu.Text).DisposeWith(disposables);
             this.Bind(ViewModel, vm => vm.TunEnableIPv6Address, v => v.togEnableIPv6Address.IsChecked).DisposeWith(disposables);

@@ -1062,6 +1062,15 @@
   <data name="TbSettingsTunStrictRoute" xml:space="preserve">
     <value>严格路由</value>
   </data>
+  <data name="TbSettingsTunWebRTCStunProxy" xml:space="preserve">
+    <value>WebRTC STUN 代理测试模式</value>
+  </data>
+  <data name="TbSettingsTunWebRTCStunProxyIP" xml:space="preserve">
+    <value>WebRTC STUN 手动 IP</value>
+  </data>
+  <data name="TbSettingsTunWebRTCStunProxyIPTip" xml:space="preserve">
+    <value>留空时使用查询到的代理出口 IP</value>
+  </data>
   <data name="TbSettingsTunStack" xml:space="preserve">
     <value>协议栈</value>
   </data>
@@ -1745,6 +1754,9 @@
   </data>
   <data name="TbSettingsSendThroughTip" xml:space="preserve">
     <value>用于多网口环境，请填写本机 IPv4 地址</value>
+  </data>
+  <data name="FillCorrectWebRTCStunProxyIP" xml:space="preserve">
+    <value>请填写正确的 WebRTC STUN 手动 IP 地址。</value>
   </data>
   <data name="TbSettingsBindInterface" xml:space="preserve">
     <value>绑定网口</value>
