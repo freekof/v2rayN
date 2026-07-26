@@ -52,6 +52,8 @@ public class Global
     public const string DefaultNetwork = "raw";
     public const string RawHeaderHttp = "http";
     public const string None = "none";
+    public const string WebRTCStunRelayTag = "webrtc-stun-relay";
+    public const int WebRTCStunRelayPort = 10818;
     public const string RawNetworkAlias = "tcp";
     public const string DefaultXhttpMode = "auto";
     public const string ProxyTag = "proxy";
