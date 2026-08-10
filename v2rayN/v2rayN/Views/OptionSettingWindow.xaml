@@ -1355,13 +1355,15 @@
                             Margin="{StaticResource Margin8}"
                             VerticalAlignment="Center"
                             Style="{StaticResource ToolbarTextBlock}"
-                            Text="{x:Static resx:ResUI.TbSettingsTunWebRTCStunProxy}" />
-                        <ToggleButton
-                            x:Name="togEnableWebRTCStunProxy"
+                            Text="{x:Static resx:ResUI.TbIpv4Address}" />
+                        <ComboBox
+                            x:Name="cmbIpv4Address"
                             Grid.Row="10"
                             Grid.Column="1"
+                            Width="200"
                             Margin="{StaticResource Margin8}"
-                            HorizontalAlignment="Left" />
+                            HorizontalAlignment="Left"
+                            Style="{StaticResource DefComboBox}" />
 
                         <TextBlock
                             Grid.Row="11"
@@ -1369,16 +1371,47 @@
                             Margin="{StaticResource Margin8}"
                             VerticalAlignment="Center"
                             Style="{StaticResource ToolbarTextBlock}"
-                            Text="{x:Static resx:ResUI.TbSettingsTunWebRTCStunProxyIP}" />
-                        <TextBox
-                            x:Name="txtWebRTCStunProxyIP"
+                            Text="{x:Static resx:ResUI.TbIpv6Address}" />
+                        <ComboBox
+                            x:Name="cmbIpv6Address"
                             Grid.Row="11"
                             Grid.Column="1"
                             Width="200"
                             Margin="{StaticResource Margin8}"
+                            HorizontalAlignment="Left"
+                            Style="{StaticResource DefComboBox}" />
+
+                        <TextBlock
+                            Grid.Row="12"
+                            Grid.Column="0"
+                            Margin="{StaticResource Margin8}"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource ToolbarTextBlock}"
+                            Text="{x:Static resx:ResUI.TbSettingsTunWebRTCStunProxy}" />
+                        <ToggleButton
+                            x:Name="togEnableWebRTCStunProxy"
+                            Grid.Row="12"
+                            Grid.Column="1"
+                            Margin="{StaticResource Margin8}"
+                            HorizontalAlignment="Left" />
+
+                        <TextBlock
+                            Grid.Row="13"
+                            Grid.Column="0"
+                            Margin="{StaticResource Margin8}"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource ToolbarTextBlock}"
+                            Text="{x:Static resx:ResUI.TbSettingsTunWebRTCStunProxyIP}" />
+                        <TextBox
+                            x:Name="txtWebRTCStunProxyIP"
+                            Grid.Row="13"
+                            Grid.Column="1"
+                            Width="200"
+                            Margin="{StaticResource Margin8}"
+                            HorizontalAlignment="Left"
                             Style="{StaticResource DefTextBox}" />
                         <TextBlock
-                            Grid.Row="11"
+                            Grid.Row="13"
                             Grid.Column="2"
                             Margin="{StaticResource Margin4}"
                             VerticalAlignment="Center"

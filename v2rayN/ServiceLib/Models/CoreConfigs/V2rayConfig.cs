@@ -364,8 +364,6 @@ public class StreamSettings4Ray
 
 public class TlsSettings4Ray
 {
-    public bool? allowInsecure { get; set; }
-
     public string? serverName { get; set; }
 
     public List<string>? alpn { get; set; }
@@ -560,6 +558,7 @@ public class Sockopt4Ray
 
     [JsonPropertyName("interface")]
     public string? Interface { get; set; }
+
     public HappyEyeballs4Ray? happyEyeballs { get; set; }
 }
 
