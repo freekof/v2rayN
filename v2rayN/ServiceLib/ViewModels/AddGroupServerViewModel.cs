@@ -224,12 +224,6 @@ public partial class AddGroupServerViewModel : MyReactiveObject, ICloseable
 
     private async Task SaveServerAsync()
     {
-        var remarks = SelectedSource.Remarks;
-        if (remarks.IsNullOrEmpty())
-        {
-            NoticeManager.Instance.Enqueue(ResUI.PleaseFillRemarks);
-            return;
-        }
         if (ChildItemsObs.Count == 0 && SelectedSubItem?.Id.IsNullOrEmpty() == true)
         {
             NoticeManager.Instance.Enqueue(ResUI.PleaseAddAtLeastOneServer);
