@@ -36,6 +36,25 @@ public class ConnectionHandlerTests
     }
 
     [Fact]
+    public void ParseJson_HandlesIpApiIsCcCountryCode()
+    {
+        const string content = """
+            {
+              "ip": "44.201.231.226",
+              "cc": "US",
+              "asn_num": 14618
+            }
+            """;
+
+        var result = IpInfoResult.ParseJson(content);
+
+        result.Should().NotBeNull();
+        result.Value.Country.Should().Be("US");
+        result.Value.Ip.Should().Be("44.201.231.226");
+        result.Value.ToCompactString().Should().Be("US44.201.231.226");
+    }
+
+    [Fact]
     public void ToCompactString_RequiresAsnWhenRequested()
     {
         var result = new IpInfoResult("de", "2001:db8::1");

@@ -7,7 +7,7 @@ public partial class ProfileItemModel : ReactiveObject
     public string IndexId { get; set; }
     public EConfigType ConfigType { get; set; }
     [Reactive]
-    public string Remarks { get; set; }
+    public partial string Remarks { get; set; }
     public string Address { get; set; }
     public int Port { get; set; }
     public string Network { get; set; }

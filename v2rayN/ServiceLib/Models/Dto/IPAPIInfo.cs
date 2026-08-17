@@ -10,6 +10,7 @@ internal class IPAPIInfo
     public string? country_name { get; set; }
     public string? country_code { get; set; }
     public string? countryCode { get; set; }
+    public string? cc { get; set; }
     public LocationInfo? location { get; set; }
     public JsonElement asn { get; set; }
     public string? asnCode { get; set; }
@@ -71,7 +72,7 @@ public readonly record struct IpInfoResult(string Country, string? Ip)
         }
 
         var ip = info.ip ?? info.clientIp ?? info.ip_addr ?? info.query;
-        var country = info.country_code ?? info.country ?? info.countryCode ?? info.location?.country_code;
+        var country = info.country_code ?? info.country ?? info.countryCode ?? info.cc ?? info.location?.country_code;
         return Create(country, ip, GetAsnCode(info));
     }
 
