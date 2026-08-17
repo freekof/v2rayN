@@ -51,7 +51,8 @@ public class ConnectionHandlerTests
         result.Should().NotBeNull();
         result.Value.Country.Should().Be("US");
         result.Value.Ip.Should().Be("44.201.231.226");
-        result.Value.ToCompactString().Should().Be("US44.201.231.226");
+        result.Value.Asn.Should().Be("AS14618");
+        result.Value.ToCompactString(requireAsn: true).Should().Be("US44.201.231.226 AS14618");
     }
 
     [Fact]

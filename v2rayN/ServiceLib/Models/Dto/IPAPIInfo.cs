@@ -13,6 +13,7 @@ internal class IPAPIInfo
     public string? cc { get; set; }
     public LocationInfo? location { get; set; }
     public JsonElement asn { get; set; }
+    public JsonElement asn_num { get; set; }
     public string? asnCode { get; set; }
 }
 
@@ -123,6 +124,15 @@ public readonly record struct IpInfoResult(string Country, string? Ip)
         if (asn.IsNotEmpty())
         {
             return asn;
+        }
+
+        if (info.asn_num.ValueKind is not (JsonValueKind.Undefined or JsonValueKind.Null))
+        {
+            asn = NormalizeAsnCode(info.asn_num.ToString());
+            if (asn.IsNotEmpty())
+            {
+                return asn;
+            }
         }
 
         if (info.asn.ValueKind is JsonValueKind.Undefined or JsonValueKind.Null)
