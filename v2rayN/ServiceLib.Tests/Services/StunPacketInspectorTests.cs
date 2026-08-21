@@ -17,7 +17,7 @@ public class StunPacketInspectorTests
             0x09, 0x0A, 0x0B, 0x0C,
         };
 
-        Assert.True(StunPacketInspector.IsStunBindingRequest(packet));
+        Xunit.Assert.True(StunPacketInspector.IsStunBindingRequest(packet));
     }
 
     [Fact]
@@ -32,7 +32,7 @@ public class StunPacketInspectorTests
             0x7F, 0x00, 0x00, 0x01,
         };
 
-        Assert.False(StunPacketInspector.IsStunBindingRequest(packet));
+        Xunit.Assert.False(StunPacketInspector.IsStunBindingRequest(packet));
     }
 
     [Fact]
@@ -47,7 +47,7 @@ public class StunPacketInspectorTests
             0x09, 0x0A, 0x0B, 0x0C,
         };
 
-        Assert.False(StunPacketInspector.IsStunBindingRequest(packet));
+        Xunit.Assert.False(StunPacketInspector.IsStunBindingRequest(packet));
     }
 
     [Fact]
@@ -62,6 +62,6 @@ public class StunPacketInspectorTests
             0x09, 0x0A, 0x0B, 0x0C,
         };
 
-        Assert.False(StunPacketInspector.IsStunBindingRequest(packet));
+        Xunit.Assert.False(StunPacketInspector.IsStunBindingRequest(packet));
     }
 }

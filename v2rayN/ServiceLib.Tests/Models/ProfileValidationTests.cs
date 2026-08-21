@@ -1,7 +1,7 @@
 using ServiceLib.Enums;
 using ServiceLib.Handler.Builder;
 using ServiceLib.Models.Entities;
-using FluentAssertions;
+using AwesomeAssertions;
 using Xunit;
 
 namespace ServiceLib.Tests.Models;

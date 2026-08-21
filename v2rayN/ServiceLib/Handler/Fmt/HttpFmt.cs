@@ -24,6 +24,7 @@ public class HttpFmt : BaseFmt
             Address = uri.IdnHost,
             Port = uri.Port,
             StreamSecurity = uri.Scheme == Uri.UriSchemeHttps ? Global.StreamSecurity : string.Empty,
+            AllowInsecure = uri.Scheme == Uri.UriSchemeHttps ? Global.StringTrue : Global.StringFalse,
         };
 
         var userInfo = uri.GetComponents(UriComponents.UserInfo, UriFormat.UriEscaped);

@@ -14,6 +14,6 @@ public class ProfileItemModelTests
 
         item.Remarks = "US1.1.1.1 AS13335";
 
-        Assert.Equal(nameof(ProfileItemModel.Remarks), changedProperty);
+        Xunit.Assert.Equal(nameof(ProfileItemModel.Remarks), changedProperty);
     }
 }
