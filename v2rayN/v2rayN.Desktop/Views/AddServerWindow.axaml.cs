@@ -190,13 +190,7 @@ public partial class AddServerWindow : WindowBase<AddServerViewModel>
                     {
                         return;
                     }
-                    var isTls = turnTransport == "tls";
-                    ViewModel.SelectedSource.StreamSecurity = isTls ? Global.StreamSecurity : string.Empty;
-                    if (!isTls)
-                    {
-                        ViewModel.AllowInsecure = false;
-                    }
-                    togAllowInsecure.IsEnabled = isTls;
+                    SetTurnTlsState(turnTransport);
                 })
                 .DisposeWith(disposables);
             this.Bind(ViewModel, vm => vm.SelectedSource.Sni, v => v.txtSNI.Text).DisposeWith(disposables);
@@ -258,9 +252,8 @@ public partial class AddServerWindow : WindowBase<AddServerViewModel>
                 gridTransport.IsVisible = false;
                 cmbCoreType.IsEnabled = false;
                 ViewModel.CoreType = nameof(ECoreType.sing_box);
-                cmbStreamSecurity.IsEnabled = false;
+                cmbStreamSecurity.IsEnabled = true;
                 gridFinalmask.IsVisible = false;
-                togAllowInsecure.IsEnabled = profileItem.GetProtocolExtra().TurnTransport == "tls";
                 break;
 
             case EConfigType.VLESS:
@@ -327,6 +320,10 @@ public partial class AddServerWindow : WindowBase<AddServerViewModel>
         }
         cmbStreamSecurity.ItemsSource = lstStreamSecurity;
         cmbStreamSecurity.SelectedItem = profileItem.StreamSecurity;
+        if (profileItem.ConfigType == EConfigType.TURN)
+        {
+            SetTurnTlsState(profileItem.GetProtocolExtra().TurnTransport);
+        }
     }
 
     private void Window_Loaded(object? sender, RoutedEventArgs e)
@@ -344,9 +341,35 @@ public partial class AddServerWindow : WindowBase<AddServerViewModel>
         SetRawHttpFieldsVisibility();
     }
 
+    private void SetTurnTlsState(string? turnTransport)
+    {
+        var isTls = turnTransport == "tls";
+        ViewModel.SelectedSource.StreamSecurity = isTls ? Global.StreamSecurity : string.Empty;
+        if (!isTls)
+        {
+            ViewModel.AllowInsecure = false;
+        }
+        togAllowInsecure.IsEnabled = isTls;
+        cmbStreamSecurity.SelectedItem = isTls ? Global.StreamSecurity : string.Empty;
+        gridRealityMore.IsVisible = false;
+        gridTlsMore.IsVisible = isTls;
+    }
+
     private void CmbStreamSecurity_SelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        var security = cmbStreamSecurity.SelectedItem.ToString();
+        var security = cmbStreamSecurity.SelectedItem?.ToString() ?? string.Empty;
+        if (ViewModel.SelectedSource.ConfigType == EConfigType.TURN)
+        {
+            var isTls = security == Global.StreamSecurity;
+            if (isTls && ViewModel.TurnTransport != "tls")
+            {
+                ViewModel.TurnTransport = "tls";
+            }
+            else if (!isTls && ViewModel.TurnTransport == "tls")
+            {
+                ViewModel.TurnTransport = "udp";
+            }
+        }
         if (security == Global.StreamSecurityReality)
         {
             gridRealityMore.IsVisible = true;

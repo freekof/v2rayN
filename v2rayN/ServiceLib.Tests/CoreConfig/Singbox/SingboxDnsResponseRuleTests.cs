@@ -17,9 +17,16 @@ public class SingboxDnsResponseRuleTests
 
         XunitAssert.True(result.Success, result.Msg);
         var root = JsonUtils.ParseJson(result.Data!.ToString())!;
-        var hostRule = root["dns"]!["rules"]!.AsArray()
-            .First(rule => rule!["server"]!.GetValue<string>() == Global.SingboxHostsDNSTag)!;
-        XunitAssert.True(hostRule!["match_response"]!.GetValue<bool>());
-        XunitAssert.True(hostRule["ip_accept_any"]!.GetValue<bool>());
+        XunitAssert.Null(root["dns"]!["independent_cache"]);
+        var rules = root["dns"]!["rules"]!.AsArray();
+        var evaluateRule = rules.First(rule =>
+            rule!["server"]!.GetValue<string>() == Global.SingboxHostsDNSTag
+            && rule["action"]!.GetValue<string>() == "evaluate")!;
+        var responseRule = rules.First(rule =>
+            rule!["server"]!.GetValue<string>() == Global.SingboxHostsDNSTag
+            && rule["action"]!.GetValue<string>() == "route")!;
+        XunitAssert.True(evaluateRule! != null);
+        XunitAssert.True(responseRule!["match_response"]!.GetValue<bool>());
+        XunitAssert.True(responseRule["ip_accept_any"]!.GetValue<bool>());
     }
 }

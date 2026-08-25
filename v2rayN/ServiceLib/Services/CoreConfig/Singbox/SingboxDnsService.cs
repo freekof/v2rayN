@@ -16,9 +16,6 @@ public partial class CoreConfigSingboxService
             GenDnsServers();
             GenDnsRules();
 
-            _coreConfig.dns ??= new Dns4Sbox();
-            _coreConfig.dns.independent_cache = true;
-
             // final dns
             var routing = context.RoutingItem;
             var useDirectDns = false;
@@ -164,10 +161,17 @@ public partial class CoreConfigSingboxService
         _coreConfig.dns ??= new Dns4Sbox();
         _coreConfig.dns.rules ??= [];
 
+        // sing-box 1.14 requires response match fields to follow a top-level evaluate action.
+        _coreConfig.dns.rules.Add(new()
+        {
+            action = "evaluate",
+            server = Global.SingboxHostsDNSTag
+        });
         _coreConfig.dns.rules.Add(new()
         {
             match_response = true,
             ip_accept_any = true,
+            action = "route",
             server = Global.SingboxHostsDNSTag
         });
 
