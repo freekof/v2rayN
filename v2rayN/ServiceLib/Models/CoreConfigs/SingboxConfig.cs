@@ -342,7 +342,8 @@ public abstract class DialFields4Sbox
     public string? fallback_delay { get; set; }
     public Tls4Sbox? tls { get; set; }
     public Multiplex4Sbox? multiplex { get; set; }
-    public Transport4Sbox? transport { get; set; }
+    // sing-box uses an object for protocol transports and a string for TURN server transport.
+    public object? transport { get; set; }
     public HyObfs4Sbox? obfs { get; set; }
     public HyRealm4Sbox? realm { get; set; }
 }

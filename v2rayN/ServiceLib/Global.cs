@@ -253,7 +253,8 @@ public class Global
         { EConfigType.TUIC, "tuic" },
         { EConfigType.WireGuard, "wireguard" },
         { EConfigType.Anytls, "anytls" },
-        { EConfigType.Naive, "naive" }
+        { EConfigType.Naive, "naive" },
+        { EConfigType.TURN, "turn" }
     };
 
     public static readonly List<string> VmessSecurities =
@@ -319,6 +320,10 @@ public class Global
         "xtls-rprx-vision-udp443"
     ];
 
+    public static readonly List<string> TurnTransports = ["udp", "tcp", "tls"];
+
+    public static readonly List<string> TurnNetworks = ["udp", "tcp"];
+
     public static readonly List<string> Networks =
     [
         "raw",
@@ -380,6 +385,7 @@ public class Global
         EConfigType.WireGuard,
         EConfigType.SOCKS,
         EConfigType.HTTP,
+        EConfigType.TURN,
     ];
 
     public static readonly HashSet<EConfigType> SingboxOnlyConfigType = SingboxSupportConfigType.Except(XraySupportConfigType).ToHashSet();

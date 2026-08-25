@@ -290,6 +290,7 @@ public static class ConfigHandler
             EConfigType.Shadowsocks => await AddShadowsocksServer(config, item),
             EConfigType.SOCKS => await AddSocksServer(config, item),
             EConfigType.HTTP => await AddHttpServer(config, item),
+            EConfigType.TURN => await AddTurnServer(config, item),
             EConfigType.Trojan => await AddTrojanServer(config, item),
             EConfigType.VLESS => await AddVlessServer(config, item),
             EConfigType.Hysteria2 => await AddHysteria2Server(config, item),
@@ -728,6 +729,49 @@ public static class ConfigHandler
         profileItem.ConfigType = EConfigType.HTTP;
 
         profileItem.Address = profileItem.Address.TrimEx();
+
+        await AddServerCommon(config, profileItem, toFile);
+
+        return 0;
+    }
+
+    /// <summary>
+    /// Add or edit a TURN server
+    /// Processes TURN-specific settings for sing-box.
+    /// </summary>
+    /// <param name="config">Current configuration</param>
+    /// <param name="profileItem">TURN profile to add</param>
+    /// <param name="toFile">Whether to save to file</param>
+    /// <returns>0 if successful, -1 if failed</returns>
+    public static async Task<int> AddTurnServer(Config config, ProfileItem profileItem, bool toFile = true)
+    {
+        profileItem.ConfigType = EConfigType.TURN;
+        profileItem.CoreType = ECoreType.sing_box;
+        profileItem.Address = profileItem.Address.TrimEx();
+        profileItem.Username = profileItem.Username.TrimEx();
+        profileItem.Password = profileItem.Password.TrimEx();
+
+        var extra = profileItem.GetProtocolExtra();
+        var turnTransport = Global.TurnTransports.Contains(extra.TurnTransport) ? extra.TurnTransport : "udp";
+        var turnNetwork = Global.TurnNetworks.Contains(extra.TurnNetwork) ? extra.TurnNetwork : null;
+        if (turnTransport == "udp" && turnNetwork == "tcp")
+        {
+            return -1;
+        }
+        if (turnTransport != "tls")
+        {
+            profileItem.StreamSecurity = string.Empty;
+            profileItem.AllowInsecure = Global.StringFalse;
+        }
+        else
+        {
+            profileItem.StreamSecurity = Global.StreamSecurity;
+        }
+        profileItem.SetProtocolExtra(extra with
+        {
+            TurnTransport = turnTransport,
+            TurnNetwork = turnNetwork,
+        });
 
         await AddServerCommon(config, profileItem, toFile);
 
@@ -1674,6 +1718,7 @@ public static class ConfigHandler
                 EConfigType.Shadowsocks => await AddShadowsocksServer(config, profileItem, false),
                 EConfigType.SOCKS => await AddSocksServer(config, profileItem, false),
                 EConfigType.HTTP => await AddHttpServer(config, profileItem, false),
+                EConfigType.TURN => await AddTurnServer(config, profileItem, false),
                 EConfigType.Trojan => await AddTrojanServer(config, profileItem, false),
                 EConfigType.VLESS => await AddVlessServer(config, profileItem, false),
                 EConfigType.Hysteria2 => await AddHysteria2Server(config, profileItem, false),
@@ -2000,6 +2045,7 @@ public static class ConfigHandler
                     EConfigType.VMess => await AddVMessServer(config, profileItem, false),
                     EConfigType.Shadowsocks => await AddShadowsocksServer(config, profileItem, false),
                     EConfigType.HTTP => await AddHttpServer(config, profileItem, false),
+                    EConfigType.TURN => await AddTurnServer(config, profileItem, false),
                     EConfigType.SOCKS => await AddSocksServer(config, profileItem, false),
                     EConfigType.Trojan => await AddTrojanServer(config, profileItem, false),
                     EConfigType.VLESS => await AddVlessServer(config, profileItem, false),

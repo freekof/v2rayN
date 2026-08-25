@@ -8,6 +8,10 @@ public record ProtocolExtraItem
     // http outbound
     public string? HttpHeaders { get; init; }
 
+    // turn
+    public string? TurnTransport { get; init; }
+    public string? TurnNetwork { get; init; }
+
     // vmess
     public string? AlterId { get; init; }
     public string? VmessSecurity { get; init; }

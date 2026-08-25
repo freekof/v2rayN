@@ -32,6 +32,8 @@ public partial class AddServerWindow : WindowBase<AddServerViewModel>
         cmbFingerprint.ItemsSource = Global.Fingerprints;
         cmbFingerprint2.ItemsSource = Global.Fingerprints;
         cmbAlpn.ItemsSource = Global.Alpns;
+        cmbTurnTransport.ItemsSource = Global.TurnTransports;
+        cmbTurnNetwork.ItemsSource = Global.TurnNetworks.Prepend(string.Empty).ToList();
 
         gridTlsMore.IsVisible = false;
 
@@ -86,6 +88,17 @@ public partial class AddServerWindow : WindowBase<AddServerViewModel>
                                 .DisposeWith(disposables);
                             this.Bind(ViewModel, vm => vm.HttpHeadersJson, v => v.txtHttpHeadersJson.Text)
                                 .DisposeWith(disposables);
+                            break;
+
+                        case EConfigType.TURN:
+                            this.Bind(ViewModel, vm => vm.SelectedSource.Username, v => v.txtTurnUsername.Text)
+                                .DisposeWith(currentTypeDisposables);
+                            this.Bind(ViewModel, vm => vm.SelectedSource.Password, v => v.txtTurnPassword.Text)
+                                .DisposeWith(currentTypeDisposables);
+                            this.Bind(ViewModel, vm => vm.TurnTransport, v => v.cmbTurnTransport.SelectedValue)
+                                .DisposeWith(currentTypeDisposables);
+                            this.Bind(ViewModel, vm => vm.TurnNetwork, v => v.cmbTurnNetwork.SelectedValue)
+                                .DisposeWith(currentTypeDisposables);
                             break;
 
                         case EConfigType.VLESS:
@@ -170,6 +183,22 @@ public partial class AddServerWindow : WindowBase<AddServerViewModel>
             this.Bind(ViewModel, vm => vm.GrpcServiceName, v => v.txtPathGrpc.Text).DisposeWith(disposables);
 
             this.Bind(ViewModel, vm => vm.SelectedSource.StreamSecurity, v => v.cmbStreamSecurity.SelectedValue).DisposeWith(disposables);
+            this.WhenAnyValue(v => v.ViewModel.TurnTransport)
+                .Subscribe(turnTransport =>
+                {
+                    if (ViewModel.SelectedSource.ConfigType != EConfigType.TURN)
+                    {
+                        return;
+                    }
+                    var isTls = turnTransport == "tls";
+                    ViewModel.SelectedSource.StreamSecurity = isTls ? Global.StreamSecurity : string.Empty;
+                    if (!isTls)
+                    {
+                        ViewModel.AllowInsecure = false;
+                    }
+                    togAllowInsecure.IsEnabled = isTls;
+                })
+                .DisposeWith(disposables);
             this.Bind(ViewModel, vm => vm.SelectedSource.Sni, v => v.txtSNI.Text).DisposeWith(disposables);
             this.Bind(ViewModel, vm => vm.AllowInsecure, v => v.togAllowInsecure.IsChecked).DisposeWith(disposables);
             this.Bind(ViewModel, vm => vm.SelectedSource.Fingerprint, v => v.cmbFingerprint.SelectedValue).DisposeWith(disposables);
@@ -221,6 +250,17 @@ public partial class AddServerWindow : WindowBase<AddServerViewModel>
                 gridSocks.IsVisible = true;
                 tbHttpHeaders.IsVisible = true;
                 txtHttpHeadersJson.IsVisible = true;
+                break;
+
+            case EConfigType.TURN:
+                gridTurn.IsVisible = true;
+                sepa2.IsVisible = false;
+                gridTransport.IsVisible = false;
+                cmbCoreType.IsEnabled = false;
+                ViewModel.CoreType = nameof(ECoreType.sing_box);
+                cmbStreamSecurity.IsEnabled = false;
+                gridFinalmask.IsVisible = false;
+                togAllowInsecure.IsEnabled = profileItem.GetProtocolExtra().TurnTransport == "tls";
                 break;
 
             case EConfigType.VLESS:

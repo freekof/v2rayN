@@ -120,6 +120,10 @@
                                     x:Name="menuAddHttpServer"
                                     Height="{StaticResource MenuItemHeight}"
                                     Header="{x:Static resx:ResUI.menuAddHttpServer}" />
+                                <MenuItem
+                                    x:Name="menuAddTurnServer"
+                                    Height="{StaticResource MenuItemHeight}"
+                                    Header="TURN" />
                                 <Separator Margin="-40,5" />
                                 <MenuItem
                                     x:Name="menuAddTuicServer"

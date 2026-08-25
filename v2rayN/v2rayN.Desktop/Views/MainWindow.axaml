@@ -47,6 +47,7 @@
                         <MenuItem x:Name="menuAddWireguardServer" Header="{x:Static resx:ResUI.menuAddWireguardServer}" />
                         <MenuItem x:Name="menuAddSocksServer" Header="{x:Static resx:ResUI.menuAddSocksServer}" />
                         <MenuItem x:Name="menuAddHttpServer" Header="{x:Static resx:ResUI.menuAddHttpServer}" />
+                        <MenuItem x:Name="menuAddTurnServer" Header="TURN" />
                         <Separator />
                         <MenuItem x:Name="menuAddTuicServer" Header="{x:Static resx:ResUI.menuAddTuicServer}" />
                         <MenuItem x:Name="menuAddAnytlsServer" Header="{x:Static resx:ResUI.menuAddAnytlsServer}" />

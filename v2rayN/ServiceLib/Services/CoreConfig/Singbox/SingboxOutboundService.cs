@@ -219,6 +219,22 @@ public partial class CoreConfigSingboxService
                         }
                         break;
                     }
+                case EConfigType.TURN:
+                    {
+                        if (_node.Username.IsNotEmpty() && _node.Password.IsNotEmpty())
+                        {
+                            outbound.username = _node.Username;
+                            outbound.password = _node.Password;
+                        }
+                        var turnTransport = Global.TurnTransports.Contains(protocolExtra.TurnTransport)
+                            ? protocolExtra.TurnTransport
+                            : "udp";
+                        outbound.transport = turnTransport;
+                        outbound.network = Global.TurnNetworks.Contains(protocolExtra.TurnNetwork)
+                            ? protocolExtra.TurnNetwork
+                            : null;
+                        break;
+                    }
                 case EConfigType.VLESS:
                     {
                         outbound.uuid = _node.Password;

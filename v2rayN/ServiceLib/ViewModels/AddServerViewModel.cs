@@ -86,6 +86,12 @@ public partial class AddServerViewModel : MyReactiveObject, ICloseable
     public partial string HttpHeadersJson { get; set; }
 
     [Reactive]
+    public partial string TurnTransport { get; set; }
+
+    [Reactive]
+    public partial string TurnNetwork { get; set; }
+
+    [Reactive]
     public partial string Hy2RealmUrl { get; set; }
 
     [Reactive]
@@ -315,6 +321,10 @@ public partial class AddServerViewModel : MyReactiveObject, ICloseable
         InsecureConcurrency = protocolExtra.InsecureConcurrency > 0 ? protocolExtra.InsecureConcurrency : null;
         NaiveQuic = protocolExtra.NaiveQuic ?? false;
         HttpHeadersJson = protocolExtra.HttpHeaders ?? string.Empty;
+        TurnTransport = Global.TurnTransports.Contains(protocolExtra.TurnTransport) ? protocolExtra.TurnTransport : "udp";
+        TurnNetwork = Global.TurnNetworks.Contains(protocolExtra.TurnNetwork)
+            ? protocolExtra.TurnNetwork
+            : TurnTransport == "udp" ? "udp" : string.Empty;
         Hy2RealmUrl = protocolExtra.Hy2RealmUrl ?? string.Empty;
         GeckoMinPacketSize = protocolExtra.GeckoMinPacketSize.ToInt();
         GeckoMaxPacketSize = protocolExtra.GeckoMaxPacketSize.ToInt();
@@ -359,13 +369,29 @@ public partial class AddServerViewModel : MyReactiveObject, ICloseable
                 return;
             }
         }
-        if (SelectedSource.ConfigType is not EConfigType.SOCKS and not EConfigType.HTTP)
+        if (SelectedSource.ConfigType is not EConfigType.SOCKS and not EConfigType.HTTP and not EConfigType.TURN)
         {
             if (SelectedSource.Password.IsNullOrEmpty())
             {
                 NoticeManager.Instance.Enqueue(ResUI.FillUUID);
                 return;
             }
+        }
+        if (SelectedSource.ConfigType == EConfigType.TURN
+            && (!Global.TurnTransports.Contains(TurnTransport)
+                || (!TurnNetwork.IsNullOrEmpty() && !Global.TurnNetworks.Contains(TurnNetwork))))
+        {
+            NoticeManager.Instance.Enqueue(ResUI.OperationFailed);
+            return;
+        }
+        if (SelectedSource.ConfigType == EConfigType.TURN && TurnTransport != "tls")
+        {
+            SelectedSource.StreamSecurity = string.Empty;
+            SelectedSource.AllowInsecure = Global.StringFalse;
+        }
+        else if (SelectedSource.ConfigType == EConfigType.TURN && SelectedSource.StreamSecurity != Global.StreamSecurity)
+        {
+            SelectedSource.StreamSecurity = Global.StreamSecurity;
         }
         HyRealm? realm = null;
         if (!Hy2RealmUrl.IsNullOrEmpty())
@@ -383,7 +409,9 @@ public partial class AddServerViewModel : MyReactiveObject, ICloseable
             return;
         }
         SelectedSource.CoreType = CoreType.IsNullOrEmpty() ? null : Enum.Parse<ECoreType>(CoreType);
-        SelectedSource.AllowInsecure = AllowInsecure ? Global.StringTrue : Global.StringFalse;
+        SelectedSource.AllowInsecure = SelectedSource.ConfigType == EConfigType.TURN && TurnTransport != "tls"
+            ? Global.StringFalse
+            : AllowInsecure ? Global.StringTrue : Global.StringFalse;
         SelectedSource.MuxEnabled = MuxEnabled;
         SelectedSource.Cert = Cert.IsNullOrEmpty() ? string.Empty : Cert;
         SelectedSource.CertSha = CertSha.IsNullOrEmpty() ? string.Empty : CertSha;
@@ -420,6 +448,8 @@ public partial class AddServerViewModel : MyReactiveObject, ICloseable
             VlessEncryption = VlessEncryption.NullIfEmpty(),
             SsMethod = SsMethod.NullIfEmpty(),
             HttpHeaders = SelectedSource.ConfigType == EConfigType.HTTP ? HttpHeadersJson.NullIfEmpty() : null,
+            TurnTransport = SelectedSource.ConfigType == EConfigType.TURN ? TurnTransport : null,
+            TurnNetwork = SelectedSource.ConfigType == EConfigType.TURN ? TurnNetwork.NullIfEmpty() : null,
             WgPublicKey = WgPublicKey.NullIfEmpty(),
             WgPresharedKey = WgPresharedKey.NullIfEmpty(),
             WgInterfaceAddress = WgInterfaceAddress.NullIfEmpty(),

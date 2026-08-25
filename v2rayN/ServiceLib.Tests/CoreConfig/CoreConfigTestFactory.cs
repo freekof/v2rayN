@@ -150,6 +150,30 @@ internal static class CoreConfigTestFactory
         };
     }
 
+    public static ProfileItem CreateTurnNode(ECoreType coreType, string indexId = "node-turn-1",
+        string remarks = "demo-turn")
+    {
+        var node = new ProfileItem
+        {
+            IndexId = indexId,
+            ConfigType = EConfigType.TURN,
+            CoreType = coreType,
+            Remarks = remarks,
+            Address = "turn.example.com",
+            Port = 3478,
+            Username = "user",
+            Password = "pass",
+            Network = nameof(ETransport.raw),
+            StreamSecurity = string.Empty,
+            Subid = string.Empty,
+        };
+        node.SetProtocolExtra(new ProtocolExtraItem
+        {
+            TurnTransport = "udp",
+        });
+        return node;
+    }
+
     public static ProfileItem CreateCustomOutboundNode(ECoreType coreType, string indexId = "node-custom-1",
         string remarks = "demo-custom-outbound", string address = "custom_outbound.json")
     {
