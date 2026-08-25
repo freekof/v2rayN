@@ -146,7 +146,7 @@ public class Outbound4Sbox : BaseServer4Sbox
     public bool? quic { get; set; }
     public string? quic_congestion_control { get; set; }
     public string? version { get; set; }
-    public string? network { get; set; }
+    public object? network { get; set; }
     public string? packet_encoding { get; set; }
     public string? plugin { get; set; }
     public string? plugin_opts { get; set; }

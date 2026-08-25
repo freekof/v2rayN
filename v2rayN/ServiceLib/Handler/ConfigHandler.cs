@@ -753,7 +753,7 @@ public static class ConfigHandler
         profileItem.Password = profileItem.Password.TrimEx();
 
         var extra = profileItem.GetProtocolExtra();
-        var turnTransport = Global.TurnTransports.Contains(extra.TurnTransport) ? extra.TurnTransport : "udp";
+        var turnTransport = Global.TurnTransports.Contains(extra.TurnTransport) ? extra.TurnTransport : "tcp";
         var turnNetwork = Global.TurnNetworks.Contains(extra.TurnNetwork) ? extra.TurnNetwork : null;
         if (turnTransport == "udp" && turnNetwork == "tcp")
         {

@@ -228,11 +228,13 @@ public partial class CoreConfigSingboxService
                         }
                         var turnTransport = Global.TurnTransports.Contains(protocolExtra.TurnTransport)
                             ? protocolExtra.TurnTransport
-                            : "udp";
+                            : "tcp";
                         outbound.transport = turnTransport;
                         outbound.network = Global.TurnNetworks.Contains(protocolExtra.TurnNetwork)
-                            ? protocolExtra.TurnNetwork
-                            : null;
+                            ? new List<string> { protocolExtra.TurnNetwork }
+                            : turnTransport == "udp"
+                                ? new List<string> { "udp" }
+                                : new List<string> { "tcp", "udp" };
                         break;
                     }
                 case EConfigType.VLESS:

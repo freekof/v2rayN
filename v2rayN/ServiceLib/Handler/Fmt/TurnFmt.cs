@@ -24,7 +24,7 @@ public class TurnFmt : BaseFmt
         var transport = GetQueryValue(query, "transport").ToLowerInvariant();
         if (transport.IsNullOrEmpty())
         {
-            transport = uri.Scheme.Equals(TurnsScheme, StringComparison.OrdinalIgnoreCase) ? "tls" : "udp";
+            transport = uri.Scheme.Equals(TurnsScheme, StringComparison.OrdinalIgnoreCase) ? "tls" : "tcp";
         }
         if (!Global.TurnTransports.Contains(transport))
         {
@@ -82,14 +82,14 @@ public class TurnFmt : BaseFmt
         }
 
         var extra = item.GetProtocolExtra();
-        var transport = extra.TurnTransport.IsNotEmpty() ? extra.TurnTransport.ToLowerInvariant() : "udp";
+        var transport = extra.TurnTransport.IsNotEmpty() ? extra.TurnTransport.ToLowerInvariant() : "tcp";
         if (!Global.TurnTransports.Contains(transport))
         {
-            transport = "udp";
+            transport = "tcp";
         }
 
         var query = new Dictionary<string, string>();
-        if (transport != "udp")
+        if (transport != "tcp")
         {
             query.Add("transport", transport);
         }

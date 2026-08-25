@@ -29,6 +29,8 @@
     <PackageVersion Include="TaskScheduler" Version="2.12.2" />
     <PackageVersion Include="TUnit" Version="1.65.38" />
     <PackageVersion Include="TUnit.Assertions.Should" Version="1.65.38-beta" />
+    <PackageVersion Include="AwesomeAssertions" Version="9.5.0" />
+    <PackageVersion Include="xunit.v3" Version="4.0.0" />
     <PackageVersion Include="WebDav.Client" Version="2.9.0" />
     <PackageVersion Include="YamlDotNet" Version="18.1.0" />
     <PackageVersion Include="ZXing.Net.Bindings.SkiaSharp" Version="0.16.22" />

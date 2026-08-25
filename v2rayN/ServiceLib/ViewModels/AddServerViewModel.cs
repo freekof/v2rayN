@@ -321,10 +321,10 @@ public partial class AddServerViewModel : MyReactiveObject, ICloseable
         InsecureConcurrency = protocolExtra.InsecureConcurrency > 0 ? protocolExtra.InsecureConcurrency : null;
         NaiveQuic = protocolExtra.NaiveQuic ?? false;
         HttpHeadersJson = protocolExtra.HttpHeaders ?? string.Empty;
-        TurnTransport = Global.TurnTransports.Contains(protocolExtra.TurnTransport) ? protocolExtra.TurnTransport : "udp";
+        TurnTransport = Global.TurnTransports.Contains(protocolExtra.TurnTransport) ? protocolExtra.TurnTransport : "tcp";
         TurnNetwork = Global.TurnNetworks.Contains(protocolExtra.TurnNetwork)
             ? protocolExtra.TurnNetwork
-            : TurnTransport == "udp" ? "udp" : string.Empty;
+            : string.Empty;
         Hy2RealmUrl = protocolExtra.Hy2RealmUrl ?? string.Empty;
         GeckoMinPacketSize = protocolExtra.GeckoMinPacketSize.ToInt();
         GeckoMaxPacketSize = protocolExtra.GeckoMaxPacketSize.ToInt();
