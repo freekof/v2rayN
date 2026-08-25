@@ -16,7 +16,7 @@ public class TurnUriTests
         XunitAssert.Equal(3478, anonymous.Port);
         XunitAssert.Equal("turn demo", anonymous.Remarks);
         XunitAssert.Equal("tcp", anonymous.GetProtocolExtra().TurnTransport);
-        XunitAssert.True(string.IsNullOrEmpty(anonymous.GetProtocolExtra().TurnNetwork));
+        XunitAssert.Equal("tcp+udp", anonymous.GetProtocolExtra().TurnNetwork);
 
         var authenticated = FmtHandler.ResolveConfig("turn://user%3Aname:p%40ss%20word@turn.example:3478#my%20turn", out var authenticatedMessage);
         XunitAssert.NotNull(authenticated);
@@ -32,7 +32,7 @@ public class TurnUriTests
         XunitAssert.Equal(Global.StreamSecurity, tls.StreamSecurity);
         XunitAssert.True(tls.GetAllowInsecure());
 
-        XunitAssert.Null(FmtHandler.ResolveConfig("turn://turn.example:3478?transport=udp&network=tcp", out _));
+        XunitAssert.Null(FmtHandler.ResolveConfig("turn://turn.example:3478?network=invalid", out _));
         XunitAssert.False(string.IsNullOrWhiteSpace(anonymousMessage));
         XunitAssert.False(string.IsNullOrWhiteSpace(authenticatedMessage));
         XunitAssert.False(string.IsNullOrWhiteSpace(tlsMessage));
@@ -61,7 +61,7 @@ public class TurnUriTests
 
         var uri = FmtHandler.GetShareUri(source);
         XunitAssert.NotNull(uri);
-        XunitAssert.StartsWith("turn://user%3Aname:p%40ss%20word@[2001:db8::2]:5349?transport=tls&network=tcp&insecure=1#", uri);
+        XunitAssert.StartsWith("turn://user%3Aname:p%40ss%20word@[2001:db8::2]:5349?network=tcp&tls=1&insecure=1#", uri);
 
         var resolved = FmtHandler.ResolveConfig(uri!, out var message);
         XunitAssert.NotNull(resolved);

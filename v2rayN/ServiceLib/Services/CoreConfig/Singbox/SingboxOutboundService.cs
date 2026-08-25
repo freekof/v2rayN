@@ -226,15 +226,19 @@ public partial class CoreConfigSingboxService
                             outbound.username = _node.Username;
                             outbound.password = _node.Password;
                         }
-                        var turnTransport = Global.TurnTransports.Contains(protocolExtra.TurnTransport)
-                            ? protocolExtra.TurnTransport
-                            : "tcp";
-                        outbound.transport = turnTransport;
-                        outbound.network = Global.TurnNetworks.Contains(protocolExtra.TurnNetwork)
-                            ? new List<string> { protocolExtra.TurnNetwork }
-                            : turnTransport == "udp"
-                                ? new List<string> { "udp" }
-                                : new List<string> { "tcp", "udp" };
+                        var turnNetwork = Global.TurnNetworks.Contains(protocolExtra.TurnNetwork)
+                            ? protocolExtra.TurnNetwork
+                            : protocolExtra.TurnTransport == "udp"
+                                ? "udp"
+                                : "tcp+udp";
+                        // TLS encrypts the TCP control connection; it is not a relay-network mode.
+                        outbound.transport = _node.StreamSecurity == Global.StreamSecurity ? "tls" : "tcp";
+                        outbound.network = turnNetwork switch
+                        {
+                            "tcp" => new List<string> { "tcp" },
+                            "udp" => new List<string> { "udp" },
+                            _ => new List<string> { "tcp", "udp" },
+                        };
                         break;
                     }
                 case EConfigType.VLESS:

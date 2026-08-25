@@ -159,7 +159,7 @@ public class FmtHandlerTests
         await resolved.Username.Should().BeEmpty();
         await resolved.Password.Should().BeEmpty();
         await resolved.GetProtocolExtra().TurnTransport.Should().BeEqualTo("tcp");
-        await resolved.GetProtocolExtra().TurnNetwork.Should().BeEmpty();
+        await resolved.GetProtocolExtra().TurnNetwork.Should().BeEqualTo("tcp+udp");
     }
 
     [Test]
@@ -192,7 +192,7 @@ public class FmtHandlerTests
     [Test]
     public async Task ResolveConfig_TurnUdpWithTcpRelay_ShouldReturnNull()
     {
-        var resolved = FmtHandler.ResolveConfig("turn://turn.example:3478?transport=udp&network=tcp", out _);
+        var resolved = FmtHandler.ResolveConfig("turn://turn.example:3478?network=invalid", out _);
 
         await resolved.Should().BeNull();
     }

@@ -753,24 +753,21 @@ public static class ConfigHandler
         profileItem.Password = profileItem.Password.TrimEx();
 
         var extra = profileItem.GetProtocolExtra();
-        var turnTransport = Global.TurnTransports.Contains(extra.TurnTransport) ? extra.TurnTransport : "tcp";
-        var turnNetwork = Global.TurnNetworks.Contains(extra.TurnNetwork) ? extra.TurnNetwork : null;
-        if (turnTransport == "udp" && turnNetwork == "tcp")
-        {
-            return -1;
-        }
-        if (turnTransport != "tls")
+        var turnNetwork = Global.TurnNetworks.Contains(extra.TurnNetwork)
+            ? extra.TurnNetwork
+            : extra.TurnTransport == "udp"
+                ? "udp"
+                : "tcp+udp";
+        var useTls = profileItem.StreamSecurity == Global.StreamSecurity;
+        if (!useTls)
         {
             profileItem.StreamSecurity = string.Empty;
             profileItem.AllowInsecure = Global.StringFalse;
         }
-        else
-        {
-            profileItem.StreamSecurity = Global.StreamSecurity;
-        }
         profileItem.SetProtocolExtra(extra with
         {
-            TurnTransport = turnTransport,
+            // Preserve this field for backward-compatible persisted profiles; TLS is now a security setting.
+            TurnTransport = useTls ? "tls" : "tcp",
             TurnNetwork = turnNetwork,
         });
 

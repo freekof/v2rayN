@@ -4,6 +4,7 @@ public class TurnFmt : BaseFmt
 {
     private const string TurnScheme = "turn";
     private const string TurnsScheme = "turns";
+    private const string TurnNetworkAll = "tcp+udp";
 
     public static ProfileItem? Resolve(string str, out string msg)
     {
@@ -21,22 +22,17 @@ public class TurnFmt : BaseFmt
         }
 
         var query = Utils.ParseQueryString(uri.Query);
-        var transport = GetQueryValue(query, "transport").ToLowerInvariant();
-        if (transport.IsNullOrEmpty())
+        var legacyTransport = GetQueryValue(query, "transport").ToLowerInvariant();
+        var useTls = uri.Scheme.Equals(TurnsScheme, StringComparison.OrdinalIgnoreCase)
+                     || GetQueryValue(query, "tls").Equals("1", StringComparison.OrdinalIgnoreCase)
+                     || GetQueryValue(query, "tls").Equals("true", StringComparison.OrdinalIgnoreCase)
+                     || legacyTransport == "tls";
+        var network = GetQueryValue(query, "network").ToLowerInvariant().Replace(' ', '+');
+        if (network.IsNullOrEmpty())
         {
-            transport = uri.Scheme.Equals(TurnsScheme, StringComparison.OrdinalIgnoreCase) ? "tls" : "tcp";
+            network = legacyTransport == "udp" ? "udp" : TurnNetworkAll;
         }
-        if (!Global.TurnTransports.Contains(transport))
-        {
-            return null;
-        }
-
-        var network = GetQueryValue(query, "network").ToLowerInvariant();
-        if (network.IsNotEmpty() && !Global.TurnNetworks.Contains(network))
-        {
-            return null;
-        }
-        if (transport == "udp" && network == "tcp")
+        if (!Global.TurnNetworks.Contains(network))
         {
             return null;
         }
@@ -48,10 +44,11 @@ public class TurnFmt : BaseFmt
             Remarks = uri.GetComponents(UriComponents.Fragment, UriFormat.Unescaped),
             Address = uri.IdnHost,
             Port = uri.Port,
-            StreamSecurity = transport == "tls" ? Global.StreamSecurity : string.Empty,
-            AllowInsecure = transport == "tls" && GetQueryValue(query, "insecure") == "1"
+            StreamSecurity = useTls ? Global.StreamSecurity : string.Empty,
+            AllowInsecure = useTls && GetQueryValue(query, "insecure") == "1"
                 ? Global.StringTrue
                 : Global.StringFalse,
+            Sni = useTls ? GetQueryDecoded(query, "sni") : string.Empty,
         };
 
         var userInfo = uri.GetComponents(UriComponents.UserInfo, UriFormat.UriEscaped);
@@ -67,7 +64,8 @@ public class TurnFmt : BaseFmt
 
         item.SetProtocolExtra(new ProtocolExtraItem
         {
-            TurnTransport = transport,
+            // Maintained for compatibility with existing persisted TURN profiles.
+            TurnTransport = useTls ? "tls" : "tcp",
             TurnNetwork = network,
         });
 
@@ -82,24 +80,28 @@ public class TurnFmt : BaseFmt
         }
 
         var extra = item.GetProtocolExtra();
-        var transport = extra.TurnTransport.IsNotEmpty() ? extra.TurnTransport.ToLowerInvariant() : "tcp";
-        if (!Global.TurnTransports.Contains(transport))
-        {
-            transport = "tcp";
-        }
-
+        var network = Global.TurnNetworks.Contains(extra.TurnNetwork)
+            ? extra.TurnNetwork
+            : extra.TurnTransport == "udp"
+                ? "udp"
+                : TurnNetworkAll;
+        var useTls = item.StreamSecurity == Global.StreamSecurity;
         var query = new Dictionary<string, string>();
-        if (transport != "tcp")
+        if (network != TurnNetworkAll)
         {
-            query.Add("transport", transport);
+            query.Add("network", network);
         }
-        if (extra.TurnNetwork.IsNotEmpty())
+        if (useTls)
         {
-            query.Add("network", extra.TurnNetwork.ToLowerInvariant());
-        }
-        if (transport == "tls" && item.GetAllowInsecure())
-        {
-            query.Add("insecure", "1");
+            query.Add("tls", "1");
+            if (item.GetAllowInsecure())
+            {
+                query.Add("insecure", "1");
+            }
+            if (item.Sni.IsNotEmpty())
+            {
+                query.Add("sni", item.Sni);
+            }
         }
 
         var userInfo = item.Username.IsNotEmpty() && item.Password.IsNotEmpty()

@@ -31,7 +31,7 @@ public partial class AddServerWindow
         cmbFingerprint2.ItemsSource = Global.Fingerprints;
         cmbAlpn.ItemsSource = Global.Alpns;
         cmbTurnTransport.ItemsSource = Global.TurnTransports;
-        cmbTurnNetwork.ItemsSource = Global.TurnNetworks.Prepend(string.Empty).ToList();
+        cmbTurnNetwork.ItemsSource = Global.TurnNetworks;
 
         gridTlsMore.Visibility = Visibility.Collapsed;
 
@@ -366,7 +366,7 @@ public partial class AddServerWindow
             }
             else if (!isTls && ViewModel.TurnTransport == "tls")
             {
-                ViewModel.TurnTransport = "udp";
+                ViewModel.TurnTransport = "tcp";
             }
         }
         if (security == Global.StreamSecurityReality)

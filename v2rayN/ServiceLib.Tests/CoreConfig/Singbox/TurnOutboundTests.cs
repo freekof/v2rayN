@@ -30,6 +30,22 @@ public class TurnOutboundTests
             .Should().BeEquivalentTo(["tcp", "udp"]);
         await defaultOutbound["tls"].Should().BeNull();
 
+        var udpNode = CoreConfigTestFactory.CreateTurnNode(ECoreType.sing_box);
+        udpNode.SetProtocolExtra(udpNode.GetProtocolExtra() with
+        {
+            TurnTransport = "tcp",
+            TurnNetwork = "udp",
+        });
+        var udpResult = new CoreConfigSingboxService(
+            CoreConfigTestFactory.CreateContext(config, udpNode, ECoreType.sing_box)).GenerateClientConfigContent();
+        await udpResult.Success.Should().BeTrue().Because($"ret msg: {udpResult.Msg}");
+        var udpConfig = JsonUtils.ParseJson(udpResult.Data!.ToString())!;
+        var udpOutbound = udpConfig["outbounds"]!.AsArray()
+            .First(o => o!["tag"]!.GetValue<string>() == Global.ProxyTag)!;
+        await udpOutbound["transport"]!.GetValue<string>().Should().BeEqualTo("tcp");
+        await udpOutbound["network"]!.AsArray().Select(n => n!.GetValue<string>()).ToList()
+            .Should().BeEquivalentTo(["udp"]);
+
         var tcpNode = CoreConfigTestFactory.CreateTurnNode(ECoreType.sing_box);
         tcpNode.SetProtocolExtra(tcpNode.GetProtocolExtra() with
         {

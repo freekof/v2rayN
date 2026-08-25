@@ -321,9 +321,11 @@ public class Global
         "xtls-rprx-vision-udp443"
     ];
 
+    // Legacy persisted control transport values; retained to migrate existing TURN profiles.
     public static readonly List<string> TurnTransports = ["udp", "tcp", "tls"];
 
-    public static readonly List<string> TurnNetworks = ["udp", "tcp"];
+    // TURN relay networks exposed in the UI. TLS is configured separately through stream security.
+    public static readonly List<string> TurnNetworks = ["tcp+udp", "tcp", "udp"];
 
     public static readonly List<string> Networks =
     [

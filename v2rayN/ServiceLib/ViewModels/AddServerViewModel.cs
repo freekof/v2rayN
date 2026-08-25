@@ -321,10 +321,12 @@ public partial class AddServerViewModel : MyReactiveObject, ICloseable
         InsecureConcurrency = protocolExtra.InsecureConcurrency > 0 ? protocolExtra.InsecureConcurrency : null;
         NaiveQuic = protocolExtra.NaiveQuic ?? false;
         HttpHeadersJson = protocolExtra.HttpHeaders ?? string.Empty;
-        TurnTransport = Global.TurnTransports.Contains(protocolExtra.TurnTransport) ? protocolExtra.TurnTransport : "tcp";
+        TurnTransport = SelectedSource?.StreamSecurity == Global.StreamSecurity ? "tls" : "tcp";
         TurnNetwork = Global.TurnNetworks.Contains(protocolExtra.TurnNetwork)
             ? protocolExtra.TurnNetwork
-            : string.Empty;
+            : protocolExtra.TurnTransport == "udp"
+                ? "udp"
+                : "tcp+udp";
         Hy2RealmUrl = protocolExtra.Hy2RealmUrl ?? string.Empty;
         GeckoMinPacketSize = protocolExtra.GeckoMinPacketSize.ToInt();
         GeckoMaxPacketSize = protocolExtra.GeckoMaxPacketSize.ToInt();
@@ -448,7 +450,9 @@ public partial class AddServerViewModel : MyReactiveObject, ICloseable
             VlessEncryption = VlessEncryption.NullIfEmpty(),
             SsMethod = SsMethod.NullIfEmpty(),
             HttpHeaders = SelectedSource.ConfigType == EConfigType.HTTP ? HttpHeadersJson.NullIfEmpty() : null,
-            TurnTransport = SelectedSource.ConfigType == EConfigType.TURN ? TurnTransport : null,
+            TurnTransport = SelectedSource.ConfigType == EConfigType.TURN
+                ? SelectedSource.StreamSecurity == Global.StreamSecurity ? "tls" : "tcp"
+                : null,
             TurnNetwork = SelectedSource.ConfigType == EConfigType.TURN ? TurnNetwork.NullIfEmpty() : null,
             WgPublicKey = WgPublicKey.NullIfEmpty(),
             WgPresharedKey = WgPresharedKey.NullIfEmpty(),

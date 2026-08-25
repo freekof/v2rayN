@@ -106,18 +106,9 @@ public class NodeValidator
                 break;
 
             case EConfigType.TURN:
-                var turnTransport = Global.TurnTransports.Contains(protocolExtra.TurnTransport)
-                    ? protocolExtra.TurnTransport
-                    : "udp";
                 v.Assert(protocolExtra.TurnNetwork.IsNullOrEmpty()
                          || Global.TurnNetworks.Contains(protocolExtra.TurnNetwork),
                     string.Format(ResUI.MsgInvalidProperty, "TURN network"));
-                v.Assert(turnTransport != "udp" || protocolExtra.TurnNetwork != "tcp",
-                    string.Format(ResUI.MsgInvalidProperty, "TURN TCP relay requires TCP or TLS transport"));
-                v.Assert(turnTransport != "tls" || item.StreamSecurity == Global.StreamSecurity,
-                    string.Format(ResUI.MsgInvalidProperty, "TURN TLS"));
-                v.Assert(turnTransport == "tls" || item.StreamSecurity != Global.StreamSecurity,
-                    string.Format(ResUI.MsgInvalidProperty, "TURN transport"));
                 v.Assert(item.Username.IsNullOrEmpty() == item.Password.IsNullOrEmpty(),
                     string.Format(ResUI.MsgInvalidProperty, "TURN credentials"));
                 break;

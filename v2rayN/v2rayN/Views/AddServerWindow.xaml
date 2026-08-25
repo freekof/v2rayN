@@ -427,9 +427,11 @@
                         Margin="{StaticResource Margin4}"
                         VerticalAlignment="Center"
                         Style="{StaticResource ToolbarTextBlock}"
+                        Visibility="Collapsed"
                         Text="{x:Static resx:ResUI.GbTransport}" />
                     <ComboBox
                         x:Name="cmbTurnTransport"
+                        Visibility="Collapsed"
                         Grid.Row="3"
                         Grid.Column="1"
                         Width="300"
@@ -450,7 +452,7 @@
                         Width="300"
                         Margin="{StaticResource Margin4}"
                         Style="{StaticResource DefComboBox}"
-                        ToolTip="Empty uses the core default: UDP for UDP transport; TCP and UDP for TCP/TLS transport." />
+                        ToolTip="TCP+UDP enables both relay networks; TCP and UDP limit relay traffic to the selected protocol." />
                 </Grid>
                 <Grid
                     x:Name="gridVLESS"
