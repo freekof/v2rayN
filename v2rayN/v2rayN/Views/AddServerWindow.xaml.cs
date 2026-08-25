@@ -93,9 +93,9 @@ public partial class AddServerWindow
                                 .DisposeWith(currentTypeDisposables);
                             this.Bind(ViewModel, vm => vm.SelectedSource.Password, v => v.txtTurnPassword.Text)
                                 .DisposeWith(currentTypeDisposables);
-                            this.Bind(ViewModel, vm => vm.TurnTransport, v => v.cmbTurnTransport.Text)
+                            this.Bind(ViewModel, vm => vm.TurnTransport, v => v.cmbTurnTransport.SelectedValue)
                                 .DisposeWith(currentTypeDisposables);
-                            this.Bind(ViewModel, vm => vm.TurnNetwork, v => v.cmbTurnNetwork.Text)
+                            this.Bind(ViewModel, vm => vm.TurnNetwork, v => v.cmbTurnNetwork.SelectedValue)
                                 .DisposeWith(currentTypeDisposables);
                             break;
 
