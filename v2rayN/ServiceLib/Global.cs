@@ -238,7 +238,8 @@ public class Global
         { EConfigType.TUIC, "tuic://" },
         { EConfigType.WireGuard, "wireguard://" },
         { EConfigType.Anytls, "anytls://" },
-        { EConfigType.Naive, "naive://" }
+        { EConfigType.Naive, "naive://" },
+        { EConfigType.TURN, "turn://" }
     };
 
     public static readonly Dictionary<EConfigType, string> ProtocolTypes = new()

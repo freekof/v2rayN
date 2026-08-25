@@ -21,6 +21,7 @@ public class FmtHandler
                 EConfigType.WireGuard => WireguardFmt.ToUri(item),
                 EConfigType.Anytls => AnytlsFmt.ToUri(item),
                 EConfigType.Naive => NaiveFmt.ToUri(item),
+                EConfigType.TURN => TurnFmt.ToUri(item),
                 _ => null,
             };
 
@@ -64,6 +65,11 @@ public class FmtHandler
                      || str.StartsWith(Global.HttpsProtocol, StringComparison.OrdinalIgnoreCase))
             {
                 return HttpFmt.Resolve(str, out msg);
+            }
+            else if (str.StartsWith(Global.ProtocolShares[EConfigType.TURN], StringComparison.OrdinalIgnoreCase)
+                     || str.StartsWith("turns://", StringComparison.OrdinalIgnoreCase))
+            {
+                return TurnFmt.Resolve(str, out msg);
             }
             else if (str.StartsWith(Global.ProtocolShares[EConfigType.Trojan]))
             {

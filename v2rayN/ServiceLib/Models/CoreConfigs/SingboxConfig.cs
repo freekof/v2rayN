@@ -84,6 +84,7 @@ public class Rule4Sbox
     public bool? no_drop { get; set; }
     public bool? source_ip_is_private { get; set; }
     public bool? ip_accept_any { get; set; }
+    public bool? match_response { get; set; }
     public int? source_port { get; set; }
     public List<string>? source_port_range { get; set; }
     public List<string>? network_type { get; set; }

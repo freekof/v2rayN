@@ -146,6 +146,78 @@ public class FmtHandlerTests
     }
 
     [Test]
+    public async Task ResolveConfig_TurnAnonymous_ShouldParseBasicFields()
+    {
+        var resolved = FmtHandler.ResolveConfig("turn://154.17.29.151:3478#turn%20demo", out var msg);
+
+        await resolved.Should().NotBeNull().Because(msg);
+        await resolved!.ConfigType.Should().BeEqualTo(EConfigType.TURN);
+        await resolved.CoreType.Should().BeEqualTo(ECoreType.sing_box);
+        await resolved.Remarks.Should().BeEqualTo("turn demo");
+        await resolved.Address.Should().BeEqualTo("154.17.29.151");
+        await resolved.Port.Should().BeEqualTo(3478);
+        await resolved.Username.Should().BeEmpty();
+        await resolved.Password.Should().BeEmpty();
+        await resolved.GetProtocolExtra().TurnTransport.Should().BeEqualTo("udp");
+        await resolved.GetProtocolExtra().TurnNetwork.Should().BeEmpty();
+    }
+
+    [Test]
+    public async Task ResolveConfig_TurnWithAuthentication_ShouldParseEscapedCredentialsAndAlias()
+    {
+        var resolved = FmtHandler.ResolveConfig("turn://user%3Aname:p%40ss%20word@turn.example:3478#my%20turn", out var msg);
+
+        await resolved.Should().NotBeNull().Because(msg);
+        await resolved!.Address.Should().BeEqualTo("turn.example");
+        await resolved.Port.Should().BeEqualTo(3478);
+        await resolved.Username.Should().BeEqualTo("user:name");
+        await resolved.Password.Should().BeEqualTo("p@ss word");
+        await resolved.Remarks.Should().BeEqualTo("my turn");
+        await resolved.GetProtocolExtra().TurnTransport.Should().BeEqualTo("udp");
+    }
+
+    [Test]
+    public async Task ResolveConfig_TurnTls_ShouldApplyTransportNetworkAndInsecureSettings()
+    {
+        var resolved = FmtHandler.ResolveConfig("turns://user:pass@turn.example:5349?network=tcp&insecure=1#tls", out var msg);
+
+        await resolved.Should().NotBeNull().Because(msg);
+        await resolved!.GetProtocolExtra().TurnTransport.Should().BeEqualTo("tls");
+        await resolved.GetProtocolExtra().TurnNetwork.Should().BeEqualTo("tcp");
+        await resolved.StreamSecurity.Should().BeEqualTo(Global.StreamSecurity);
+        await resolved.GetAllowInsecure().Should().BeTrue();
+        await resolved.Remarks.Should().BeEqualTo("tls");
+    }
+
+    [Test]
+    public async Task ResolveConfig_TurnUdpWithTcpRelay_ShouldReturnNull()
+    {
+        var resolved = FmtHandler.ResolveConfig("turn://turn.example:3478?network=tcp", out _);
+
+        await resolved.Should().BeNull();
+    }
+
+    [Test]
+    public async Task GetShareUriAndResolveConfig_Turn_ShouldRoundTripBasicFields()
+    {
+        var source = CreateTurnProfile();
+        var uri = FmtHandler.GetShareUri(source);
+        await uri.Should().StartWith("turn://");
+
+        var resolved = FmtHandler.ResolveConfig(uri!, out var msg);
+        await resolved.Should().NotBeNull().Because($"uri: {uri}, msg: {msg}");
+        await resolved!.ConfigType.Should().BeEqualTo(EConfigType.TURN);
+        await resolved.Remarks.Should().BeEqualTo(source.Remarks);
+        await resolved.Address.Should().BeEqualTo(source.Address);
+        await resolved.Port.Should().BeEqualTo(source.Port);
+        await resolved.Username.Should().BeEqualTo(source.Username);
+        await resolved.Password.Should().BeEqualTo(source.Password);
+        await resolved.GetProtocolExtra().TurnTransport.Should().BeEqualTo("tls");
+        await resolved.GetProtocolExtra().TurnNetwork.Should().BeEqualTo("tcp");
+        await resolved.GetAllowInsecure().Should().BeTrue();
+    }
+
+    [Test]
     public async Task ResolveConfig_UnsupportedProtocol_ShouldReturnNull()
     {
         var resolved = FmtHandler.ResolveConfig("not-a-share-uri", out var msg);
@@ -248,6 +320,28 @@ public class FmtHandlerTests
             Username = "user",
             Password = "pass",
         };
+    }
+
+    private static ProfileItem CreateTurnProfile()
+    {
+        var item = new ProfileItem
+        {
+            ConfigType = EConfigType.TURN,
+            CoreType = ECoreType.sing_box,
+            Remarks = "TURN IPv6 demo",
+            Address = "2001:db8::2",
+            Port = 5349,
+            Username = "user:name",
+            Password = "p@ss word",
+            StreamSecurity = Global.StreamSecurity,
+            AllowInsecure = Global.StringTrue,
+        };
+        item.SetProtocolExtra(new ProtocolExtraItem
+        {
+            TurnTransport = "tls",
+            TurnNetwork = "tcp",
+        });
+        return item;
     }
 
     private static ProfileItem CreateHttpProfile(bool useTls)

@@ -164,7 +164,12 @@ public partial class CoreConfigSingboxService
         _coreConfig.dns ??= new Dns4Sbox();
         _coreConfig.dns.rules ??= [];
 
-        _coreConfig.dns.rules.Add(new() { ip_accept_any = true, server = Global.SingboxHostsDNSTag });
+        _coreConfig.dns.rules.Add(new()
+        {
+            match_response = true,
+            ip_accept_any = true,
+            server = Global.SingboxHostsDNSTag
+        });
 
         if (context.ProtectDomainList.Count > 0)
         {
