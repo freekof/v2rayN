@@ -16,7 +16,7 @@ public sealed class ProxyPublicIpAddressProvider : IStunMappedAddressProvider
     private DateTime _cacheExpiresAt;
 
     public ProxyPublicIpAddressProvider(string proxyHost, int proxyPort)
-        : this(proxyHost, proxyPort, string.Empty, ConnectionHandler.GetIPInfo)
+        : this(proxyHost, proxyPort, string.Empty, proxy => ConnectionHandler.GetIPInfo(proxy))
     {
     }
 
@@ -26,7 +26,7 @@ public sealed class ProxyPublicIpAddressProvider : IStunMappedAddressProvider
     }
 
     public ProxyPublicIpAddressProvider(string proxyHost, int proxyPort, string? manualIpAddress)
-        : this(proxyHost, proxyPort, manualIpAddress, ConnectionHandler.GetIPInfo)
+        : this(proxyHost, proxyPort, manualIpAddress, proxy => ConnectionHandler.GetIPInfo(proxy))
     {
     }
 

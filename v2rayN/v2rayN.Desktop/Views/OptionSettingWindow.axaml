@@ -1274,6 +1274,18 @@
                         Grid.Column="1"
                         Width="200"
                         Margin="{StaticResource Margin4}" />
+                    <TextBlock
+                        Grid.Row="10"
+                        Grid.Column="0"
+                        Margin="{StaticResource Margin4}"
+                        VerticalAlignment="Center"
+                        Text="MASQUE" />
+                    <ComboBox
+                        x:Name="cmbCoreType14"
+                        Grid.Row="10"
+                        Grid.Column="1"
+                        Width="200"
+                        Margin="{StaticResource Margin4}" />
                 </Grid>
             </TabItem>
         </TabControl>
