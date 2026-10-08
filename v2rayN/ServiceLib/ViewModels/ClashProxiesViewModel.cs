@@ -2,8 +2,10 @@ namespace ServiceLib.ViewModels;
 
 public partial class ClashProxiesViewModel : MyReactiveObject
 {
+    private const string _tag = "ClashProxiesViewModel";
     private readonly int _delayTimeout = 99999999;
     private ClashItem _clashItem = new();
+    private int _isDelayTesting;
 
     public ClashProxiesViewModel()
     {
@@ -97,8 +99,40 @@ public partial class ClashProxiesViewModel : MyReactiveObject
 
     public async Task ProxiesReload()
     {
-        await GetClashProxies(testDelay: true);
-        await GetClashModes();
+        try
+        {
+            await GetClashProxies();
+            await GetClashModes();
+        }
+        catch (Exception ex)
+        {
+            //刷新失败不应影响内核重载流程
+            Logging.SaveLog(_tag, ex);
+            return;
+        }
+
+        //测速不阻塞重载流程（与同步上游前的行为一致），全部跑完后再回读一次，
+        //把各节点的 history 带回来，切换分组时也能直接看到延迟
+        if (Interlocked.CompareExchange(ref _isDelayTesting, 1, 0) != 0)
+        {
+            return;
+        }
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await TestAllProxiesDelay();
+                await GetClashProxies();
+            }
+            catch (Exception ex)
+            {
+                Logging.SaveLog(_tag, ex);
+            }
+            finally
+            {
+                Interlocked.Exchange(ref _isDelayTesting, 0);
+            }
+        });
     }
 
     #region task
@@ -149,7 +183,7 @@ public partial class ClashProxiesViewModel : MyReactiveObject
         await ClashApiManager.Instance.UpdateClashMode(mode);
     }
 
-    private async Task GetClashProxies(bool testDelay = false)
+    private async Task GetClashProxies()
     {
         var ret = await ClashApiManager.Instance.GetProxies();
         if (ret?.IsEmpty() != false)
@@ -158,21 +192,21 @@ public partial class ClashProxiesViewModel : MyReactiveObject
         }
         _clashItem = ret;
 
+        //列表更新必须回到 UI 线程，并等待刷新完成后调用方才能继续
         var refreshed = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         RxSchedulers.MainThreadScheduler.Schedule(async () =>
         {
             try
             {
                 await RefreshProxyGroups();
-                if (testDelay)
-                {
-                    await TestGroupProxiesDelay();
-                }
-                refreshed.TrySetResult();
             }
             catch (Exception ex)
             {
-                refreshed.TrySetException(ex);
+                Logging.SaveLog(_tag, ex);
+            }
+            finally
+            {
+                refreshed.TrySetResult();
             }
         });
         await refreshed.Task;
@@ -297,21 +331,9 @@ public partial class ClashProxiesViewModel : MyReactiveObject
 
     public async Task SetActiveProxy()
     {
-        if (SelectedGroup.Name.IsNullOrEmpty())
-        {
-            return;
-        }
-        if (SelectedDetail.Name.IsNullOrEmpty())
-        {
-            return;
-        }
-        var groupName = SelectedGroup.Name;
-        if (groupName.IsNullOrEmpty())
-        {
-            return;
-        }
-        var nodeName = SelectedDetail.Name;
-        if (nodeName.IsNullOrEmpty())
+        var groupName = SelectedGroup?.Name;
+        var nodeName = SelectedDetail?.Name;
+        if (groupName.IsNullOrEmpty() || nodeName.IsNullOrEmpty())
         {
             return;
         }
@@ -323,7 +345,7 @@ public partial class ClashProxiesViewModel : MyReactiveObject
         }
 
         await ClashApiManager.Instance.SetActiveProxy(groupName, nodeName);
-        await GetClashProxies(testDelay: true);
+        await GetClashProxies();
         NoticeManager.Instance.Enqueue(ResUI.OperationSuccess);
     }
 
@@ -355,19 +377,54 @@ public partial class ClashProxiesViewModel : MyReactiveObject
         await Task.CompletedTask;
     }
 
+    /// <summary>
+    /// 测速当前选中分组下的全部节点（闪电按钮）
+    /// </summary>
     private async Task TestGroupProxiesDelay()
     {
-        var groupProxy = TryGetProxy(SelectedGroup.Name);
-        if (!Global.allowSelectType.Contains(groupProxy?.type))
+        var groupProxy = TryGetProxy(SelectedGroup?.Name);
+        //接口返回的分组类型是 "Selector"/"URLTest"/"Fallback"，必须忽略大小写后再比较
+        if (!Global.allowSelectType.Contains(groupProxy?.type?.ToLower()))
         {
             return;
         }
 
+        var members = groupProxy?.all;
+        if (members == null)
+        {
+            return;
+        }
+
+        //跳过嵌套的分组，只测真实节点
+        var names = members
+            .Where(name => name.IsNotEmpty()
+                           && !Global.notAllowTestType.Contains(TryGetProxy(name)?.type?.ToLower()))
+            .ToList();
+
+        await TestProxiesDelay(names);
+    }
+
+    /// <summary>
+    /// 测速所有真实节点（不含分组），用于刷新/内核启动后自动填充延迟
+    /// </summary>
+    private async Task TestAllProxiesDelay()
+    {
+        var names = _clashItem.Proxies
+            .Where(kv => kv.Key.IsNotEmpty()
+                         && !Global.notAllowTestType.Contains(kv.Value.type?.ToLower()))
+            .Select(kv => kv.Key)
+            .ToList();
+
+        await TestProxiesDelay(names);
+    }
+
+    private async Task TestProxiesDelay(IEnumerable<string> names)
+    {
         var options = new ParallelOptions
         {
-            MaxDegreeOfParallelism = 4,
+            MaxDegreeOfParallelism = 8,
         };
-        await Parallel.ForEachAsync(groupProxy?.all ?? [], options, async (name, _) =>
+        await Parallel.ForEachAsync(names, options, async (name, _) =>
         {
             await TestProxyDelay(name);
         });
@@ -380,8 +437,18 @@ public partial class ClashProxiesViewModel : MyReactiveObject
         {
             return;
         }
-        detail.Delay = Convert.ToInt32(result.Delay);
-        detail.DelayName = $"{detail.Delay}ms";
+
+        //测速失败时保持空白，不要显示成 -1ms（与同步上游前一致）
+        if (int.TryParse(result.Delay, out var delay) && delay > 0)
+        {
+            detail.Delay = delay;
+            detail.DelayName = $"{delay}ms";
+        }
+        else
+        {
+            detail.Delay = _delayTimeout;
+            detail.DelayName = string.Empty;
+        }
         await Task.CompletedTask;
     }
 
