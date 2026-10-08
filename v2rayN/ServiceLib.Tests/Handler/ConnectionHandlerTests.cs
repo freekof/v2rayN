@@ -14,7 +14,7 @@ public class ConnectionHandlerTests
         var result = IpInfoResult.ParseCloudflareTrace(content);
 
         result.Should().NotBeNull();
-        result.Value.ToString().Should().Be("(US) 1.1.1.1 AS13335");
+        result.Value.ToString().Should().Be("🇺🇸(US) 1.1.1.1 AS13335");
         result.Value.ToCompactString(requireAsn: true).Should().Be("US1.1.1.1 AS13335");
     }
 

@@ -30,6 +30,9 @@ jobs:
     - name: Test Code
       run: dotnet test --project ./v2rayN/ServiceLib.Tests -c Release --results-directory ./TestResults -- --report-trx
 
+    - name: Test xUnit Code
+      run: dotnet run --project ./v2rayN/ServiceLib.XunitTests -c Release -- --results-directory ./TestResults --report-xunit-trx
+
     - name: Comment PR with results
       if: always()
       uses: EnricoMi/publish-unit-test-result-action@v2

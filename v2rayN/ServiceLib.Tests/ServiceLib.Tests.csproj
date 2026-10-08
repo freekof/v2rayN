@@ -10,8 +10,6 @@
     <ItemGroup>
         <PackageReference Include="TUnit" />
         <PackageReference Include="TUnit.Assertions.Should" />
-        <PackageReference Include="AwesomeAssertions" />
-        <PackageReference Include="xunit.v3" />
     </ItemGroup>
 
     <ItemGroup>
@@ -19,6 +17,17 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Compile Remove="Services\StunTcpRelayServiceTests.cs" />
+        <Compile Remove="Services\StunPacketInspectorTests.cs" />
+        <Compile Remove="Services\Socks5UdpPacketTests.cs" />
+        <Compile Remove="Services\ProxyPublicIpAddressProviderTests.cs" />
+        <Compile Remove="Services\StunBindingResponseBuilderTests.cs" />
+        <Compile Remove="Handler\ConnectionHandlerTests.cs" />
+        <Compile Remove="Models\ProfileValidationTests.cs" />
+        <Compile Remove="Models\ProfileItemModelTests.cs" />
+        <Compile Remove="Fmt\TurnUriTests.cs" />
+        <Compile Remove="CoreConfig\Singbox\TurnOutboundTests.cs" />
+        <Compile Remove="CoreConfig\Singbox\SingboxDnsResponseRuleTests.cs" />
     </ItemGroup>
 
 </Project>

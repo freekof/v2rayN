@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <IsPackable>false</IsPackable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="xunit.v3" />
+        <PackageReference Include="AwesomeAssertions" />
+        <PackageReference Include="TUnit.Assertions.Should" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\ServiceLib\ServiceLib.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Include="..\ServiceLib.Tests\GlobalUsings.cs" Link="GlobalUsings.cs" />
+        <Compile Include="..\ServiceLib.Tests\CoreConfig\CoreConfigTestFactory.cs" Link="CoreConfig\CoreConfigTestFactory.cs" />
+        <Compile Include="..\ServiceLib.Tests\Services\StunTcpRelayServiceTests.cs" Link="Services\StunTcpRelayServiceTests.cs" />
+        <Compile Include="..\ServiceLib.Tests\Services\StunPacketInspectorTests.cs" Link="Services\StunPacketInspectorTests.cs" />
+        <Compile Include="..\ServiceLib.Tests\Services\Socks5UdpPacketTests.cs" Link="Services\Socks5UdpPacketTests.cs" />
+        <Compile Include="..\ServiceLib.Tests\Services\ProxyPublicIpAddressProviderTests.cs" Link="Services\ProxyPublicIpAddressProviderTests.cs" />
+        <Compile Include="..\ServiceLib.Tests\Services\StunBindingResponseBuilderTests.cs" Link="Services\StunBindingResponseBuilderTests.cs" />
+        <Compile Include="..\ServiceLib.Tests\Handler\ConnectionHandlerTests.cs" Link="Handler\ConnectionHandlerTests.cs" />
+        <Compile Include="..\ServiceLib.Tests\Models\ProfileValidationTests.cs" Link="Models\ProfileValidationTests.cs" />
+        <Compile Include="..\ServiceLib.Tests\Models\ProfileItemModelTests.cs" Link="Models\ProfileItemModelTests.cs" />
+        <Compile Include="..\ServiceLib.Tests\Fmt\TurnUriTests.cs" Link="Fmt\TurnUriTests.cs" />
+        <Compile Include="..\ServiceLib.Tests\CoreConfig\Singbox\TurnOutboundTests.cs" Link="CoreConfig\Singbox\TurnOutboundTests.cs" />
+        <Compile Include="..\ServiceLib.Tests\CoreConfig\Singbox\SingboxDnsResponseRuleTests.cs" Link="CoreConfig\Singbox\SingboxDnsResponseRuleTests.cs" />
+    </ItemGroup>
+</Project>
