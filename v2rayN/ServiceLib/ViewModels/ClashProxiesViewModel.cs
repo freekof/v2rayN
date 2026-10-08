@@ -97,7 +97,7 @@ public partial class ClashProxiesViewModel : MyReactiveObject
 
     public async Task ProxiesReload()
     {
-        await GetClashProxies();
+        await GetClashProxies(testDelay: true);
         await GetClashModes();
     }
 
@@ -149,7 +149,7 @@ public partial class ClashProxiesViewModel : MyReactiveObject
         await ClashApiManager.Instance.UpdateClashMode(mode);
     }
 
-    private async Task GetClashProxies()
+    private async Task GetClashProxies(bool testDelay = false)
     {
         var ret = await ClashApiManager.Instance.GetProxies();
         if (ret?.IsEmpty() != false)
@@ -158,7 +158,24 @@ public partial class ClashProxiesViewModel : MyReactiveObject
         }
         _clashItem = ret;
 
-        RxSchedulers.MainThreadScheduler.Schedule(() => _ = RefreshProxyGroups());
+        var refreshed = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        RxSchedulers.MainThreadScheduler.Schedule(async () =>
+        {
+            try
+            {
+                await RefreshProxyGroups();
+                if (testDelay)
+                {
+                    await TestGroupProxiesDelay();
+                }
+                refreshed.TrySetResult();
+            }
+            catch (Exception ex)
+            {
+                refreshed.TrySetException(ex);
+            }
+        });
+        await refreshed.Task;
     }
 
     public async Task RefreshProxyGroups()
@@ -306,7 +323,7 @@ public partial class ClashProxiesViewModel : MyReactiveObject
         }
 
         await ClashApiManager.Instance.SetActiveProxy(groupName, nodeName);
-        await GetClashProxies();
+        await GetClashProxies(testDelay: true);
         NoticeManager.Instance.Enqueue(ResUI.OperationSuccess);
     }
 
@@ -334,7 +351,8 @@ public partial class ClashProxiesViewModel : MyReactiveObject
             IndexId = name,
             Delay = result.ToString(),
         };
-        await ProxiesDelayTestResult(model);
+        RxSchedulers.MainThreadScheduler.Schedule(() => _ = ProxiesDelayTestResult(model));
+        await Task.CompletedTask;
     }
 
     private async Task TestGroupProxiesDelay()
