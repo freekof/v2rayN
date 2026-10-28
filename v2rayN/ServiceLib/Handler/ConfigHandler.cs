@@ -139,6 +139,10 @@ public static class ConfigHandler
         {
             config.SpeedTestItem.SpeedPingTestUrl = Global.SpeedPingTestUrls.First();
         }
+        if (config.SpeedTestItem.IPAPIUrl.IsNullOrEmpty())
+        {
+            config.SpeedTestItem.IPAPIUrl = Global.IPAPIUrls.First();
+        }
         config.SpeedTestItem.MixedConcurrencyCount = Math.Max(config.SpeedTestItem.MixedConcurrencyCount, Global.SpeedTestConcurrencyCountMin);
         if (config.SpeedTestItem.UdpTestTarget.IsNullOrEmpty())
         {

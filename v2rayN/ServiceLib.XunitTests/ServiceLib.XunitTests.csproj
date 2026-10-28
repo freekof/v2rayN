@@ -22,6 +22,7 @@
         <Compile Include="..\ServiceLib.Tests\Services\ProxyPublicIpAddressProviderTests.cs" Link="Services\ProxyPublicIpAddressProviderTests.cs" />
         <Compile Include="..\ServiceLib.Tests\Services\StunBindingResponseBuilderTests.cs" Link="Services\StunBindingResponseBuilderTests.cs" />
         <Compile Include="..\ServiceLib.Tests\Handler\ConnectionHandlerTests.cs" Link="Handler\ConnectionHandlerTests.cs" />
+        <Compile Include="..\ServiceLib.Tests\Handler\ConfigHandlerTests.cs" Link="Handler\ConfigHandlerTests.cs" />
         <Compile Include="..\ServiceLib.Tests\Models\ProfileValidationTests.cs" Link="Models\ProfileValidationTests.cs" />
         <Compile Include="..\ServiceLib.Tests\Models\ProfileItemModelTests.cs" Link="Models\ProfileItemModelTests.cs" />
         <Compile Include="..\ServiceLib.Tests\Fmt\TurnUriTests.cs" Link="Fmt\TurnUriTests.cs" />
