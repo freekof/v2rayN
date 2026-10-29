@@ -123,14 +123,7 @@ public static class ConnectionHandler
                 return null;
             }
 
-            var downloadHandle = new DownloadService();
-            var result = await downloadHandle.TryDownloadString(url, webProxy, "", cancellationToken);
-            if (result == null)
-            {
-                return null;
-            }
-
-            return IpInfoResult.ParseJson(result);
+            return await GetIpApiInfo(url, webProxy, 10, cancellationToken);
         }
         catch
         {
@@ -153,11 +146,13 @@ public static class ConnectionHandler
         return null;
     }
 
-    private static async Task<IpInfoResult?> GetIpApiInfo(string url, IWebProxy? webProxy, int downloadTimeout)
+    private static async Task<IpInfoResult?> GetIpApiInfo(string url, IWebProxy? webProxy, int downloadTimeout,
+        CancellationToken cancellationToken = default)
     {
         try
         {
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(downloadTimeout));
+            using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(downloadTimeout));
+            using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
             using var client = new HttpClient(new SocketsHttpHandler
             {
                 Proxy = webProxy,
@@ -166,13 +161,13 @@ public static class ConnectionHandler
             });
             client.DefaultRequestHeaders.UserAgent.TryParseAdd(Utils.GetVersion(false));
 
-            using var response = await client.GetAsync(url, cts.Token).ConfigureAwait(false);
+            using var response = await client.GetAsync(url, linkedCts.Token).ConfigureAwait(false);
             if (!response.IsSuccessStatusCode)
             {
                 return null;
             }
 
-            var content = await response.Content.ReadAsStringAsync(cts.Token).ConfigureAwait(false);
+            var content = await response.Content.ReadAsStringAsync(linkedCts.Token).ConfigureAwait(false);
             return url.Contains("/cdn-cgi/trace", StringComparison.OrdinalIgnoreCase)
                 ? IpInfoResult.ParseCloudflareTrace(content)
                 : IpInfoResult.ParseJson(content);

@@ -395,7 +395,7 @@ public partial class ProfilesView : ReactiveUserControl<ProfilesViewModel>
                         }
                         if (item.Name.Equals("IpInfo", StringComparison.CurrentCultureIgnoreCase))
                         {
-                            item2.IsVisible = _config.SpeedTestItem.IPAPIUrl.IsNotEmpty() && !_config.UiItem.HideColumnIpInfo;
+                            item2.IsVisible = _config.SpeedTestItem.IPAPIUrl.IsNotEmpty();
                         }
                     }
                 }
