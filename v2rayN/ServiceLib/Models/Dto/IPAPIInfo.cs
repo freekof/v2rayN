@@ -115,7 +115,34 @@ public readonly record struct IpInfoResult(string Country, string? Ip)
 
     private static string NormalizeCountry(string? country)
     {
-        return country.IsNullOrEmpty() ? "unknown" : country.Trim().ToUpperInvariant();
+        if (country.IsNullOrEmpty())
+        {
+            return "unknown";
+        }
+
+        country = country.Trim();
+        if (country.Length == 2)
+        {
+            return country.ToUpperInvariant();
+        }
+
+        try
+        {
+            var region = System.Globalization.CultureInfo
+                .GetCultures(System.Globalization.CultureTypes.SpecificCultures)
+                .Select(culture => new System.Globalization.RegionInfo(culture.Name))
+                .FirstOrDefault(region => region.EnglishName.Equals(country, StringComparison.OrdinalIgnoreCase));
+            if (region != null)
+            {
+                return region.TwoLetterISORegionName.ToUpperInvariant();
+            }
+        }
+        catch
+        {
+            // Keep the original value if the runtime has no matching region data.
+        }
+
+        return country.ToUpperInvariant();
     }
 
     private static string? GetAsnCode(IPAPIInfo info)

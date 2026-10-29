@@ -142,6 +142,7 @@ public static class ConfigHandler
         if (config.SpeedTestItem.IPAPIUrl.IsNullOrEmpty())
         {
             config.SpeedTestItem.IPAPIUrl = Global.IPAPIUrls.First();
+            config.UiItem.HideColumnIpInfo = false;
         }
         config.SpeedTestItem.MixedConcurrencyCount = Math.Max(config.SpeedTestItem.MixedConcurrencyCount, Global.SpeedTestConcurrencyCountMin);
         if (config.SpeedTestItem.UdpTestTarget.IsNullOrEmpty())

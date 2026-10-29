@@ -56,6 +56,26 @@ public class ConnectionHandlerTests
     }
 
     [Fact]
+    public void ParseJson_HandlesCurrentIpApiIsResponse()
+    {
+        const string content = """
+            {
+              "ip": "119.73.3.100",
+              "asn": "AS133502 Linkdotnet Telecom Limited",
+              "country": "Pakistan"
+            }
+            """;
+
+        var result = IpInfoResult.ParseJson(content);
+
+        result.Should().NotBeNull();
+        result.Value.Country.Should().Be("PK");
+        result.Value.Ip.Should().Be("119.73.3.100");
+        result.Value.Asn.Should().Be("AS133502");
+        result.Value.ToCompactString(requireAsn: true).Should().Be("PK119.73.3.100 AS133502");
+    }
+
+    [Fact]
     public void ToCompactString_RequiresAsnWhenRequested()
     {
         var result = new IpInfoResult("de", "2001:db8::1");
