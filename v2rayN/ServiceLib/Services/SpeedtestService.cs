@@ -501,7 +501,7 @@ public class SpeedtestService(Config config, Func<SpeedTestResult, Task> updateF
             var ipInfo = await ConnectionHandler.GetIPInfo(webProxy, ct);
             var ipStr = ipInfo?.ToString() ?? Global.None;
             ProfileExManager.Instance.SetTestIpInfo(it.IndexId, ipStr);
-            await UpdateIpInfoFunc(it.IndexId, ipStr);
+            await UpdateIpInfoFunc(it.IndexId, ipStr, ipInfo?.ToAliasString());
         }
         else
         {
@@ -611,8 +611,8 @@ public class SpeedtestService(Config config, Func<SpeedTestResult, Task> updateF
         }
     }
 
-    private async Task UpdateIpInfoFunc(string indexId, string ip)
+    private async Task UpdateIpInfoFunc(string indexId, string ip, string? alias = null)
     {
-        await _updateFunc?.Invoke(new() { IndexId = indexId, IpInfo = ip });
+        await _updateFunc?.Invoke(new() { IndexId = indexId, IpInfo = ip, Remarks = alias });
     }
 }

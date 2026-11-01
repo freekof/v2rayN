@@ -99,6 +99,14 @@ public readonly record struct IpInfoResult(string Country, string? Ip)
             : $"{emoji}({country}) {Ip?.Trim()}";
     }
 
+    public string ToAliasString()
+    {
+        var country = NormalizeCountry(Country);
+        return Asn.IsNotEmpty()
+            ? $"{country} {Ip?.Trim()} {Asn}"
+            : $"{country} {Ip?.Trim()}";
+    }
+
     private static IpInfoResult? Create(string? country, string? ip, string? asn)
     {
         ip = ip?.Trim();

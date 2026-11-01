@@ -73,6 +73,7 @@ public class ConnectionHandlerTests
         result.Value.Ip.Should().Be("119.73.3.100");
         result.Value.Asn.Should().Be("AS133502");
         result.Value.ToCompactString(requireAsn: true).Should().Be("PK119.73.3.100 AS133502");
+        result.Value.ToAliasString().Should().Be("PK 119.73.3.100 AS133502");
     }
 
     [Fact]
