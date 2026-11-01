@@ -1,4 +1,6 @@
 using AwesomeAssertions;
+using ServiceLib;
+using ServiceLib.Handler;
 using ServiceLib.Models.Configs;
 using Xunit;
 
