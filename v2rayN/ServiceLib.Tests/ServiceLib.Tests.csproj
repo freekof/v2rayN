@@ -5,6 +5,7 @@
         <IsPackable>false</IsPackable>
         <ImplicitUsings>enable</ImplicitUsings>
         <NoWarn>$(NoWarn);TUnitAssertions0002</NoWarn>
+        <PublishAot>true</PublishAot>
     </PropertyGroup>
 
     <ItemGroup>
