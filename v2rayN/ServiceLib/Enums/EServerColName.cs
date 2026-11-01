@@ -12,7 +12,6 @@ public enum EServerColName
     SubRemarks,
     DelayVal,
     SpeedVal,
-    IpInfo,
 
     TodayDown,
     TodayUp,

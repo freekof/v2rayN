@@ -532,7 +532,7 @@ public partial class MainWindowViewModel : MyReactiveObject
     public async Task AddServerViaImageAsync()
     {
         var imageFileName = await BrowseImageFileInteraction.HandleSafe(RxVoid.Default);
-        await AddScanResultAsync(imageFileName);
+        await ScanImageResult(imageFileName);
     }
 
     public async Task ScanImageResult(string fileName)
@@ -726,7 +726,7 @@ public partial class MainWindowViewModel : MyReactiveObject
                 await ProfilesViewModel.SetSpeedTestResult(new()
                 {
                     IndexId = profileItem.IndexId,
-                    IpInfo = result.Ip,
+                    Remarks = result.Ip,
                     Delay = result.Time > 0 ? result.Time.ToString() : null
                 });
             });

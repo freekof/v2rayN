@@ -1788,9 +1788,6 @@
   <data name="MsgNotSupport" xml:space="preserve">
     <value>Не поддерживается</value>
   </data>
-  <data name="LvTestIpInfo" xml:space="preserve">
-    <value>Информация об IP</value>
-  </data>
   <data name="menuNewUpdate" xml:space="preserve">
     <value>Доступно обновление</value>
   </data>

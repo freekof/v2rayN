@@ -1785,9 +1785,6 @@ Təyin edildikdə sertifikat sabitlənəcək və "Təhlükəsiz olmayan əlaqəy
   <data name="MsgNotSupport" xml:space="preserve">
     <value>Dəstəklənmir</value>
   </data>
-  <data name="LvTestIpInfo" xml:space="preserve">
-    <value>IP məlumatı</value>
-  </data>
   <data name="menuNewUpdate" xml:space="preserve">
     <value>Yeni yeniləmə</value>
   </data>

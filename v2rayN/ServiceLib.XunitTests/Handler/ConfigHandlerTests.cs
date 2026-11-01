@@ -15,9 +15,4 @@ public class ConfigHandlerTests
         config!.SpeedTestItem.IPAPIUrl.Should().Be(Global.IPAPIUrls.First());
     }
 
-    [Fact]
-    public void UiItem_ShowsIpInfoByDefault()
-    {
-        new UIItem().HideColumnIpInfo.Should().BeFalse();
-    }
 }

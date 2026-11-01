@@ -350,10 +350,6 @@ public partial class ProfilesView
                         {
                             item2.Visibility = _config.GuiItem.EnableStatistics ? Visibility.Visible : Visibility.Hidden;
                         }
-                        if (item.Name.Equals("IpInfo", StringComparison.CurrentCultureIgnoreCase))
-                        {
-                            item2.Visibility = _config.SpeedTestItem.IPAPIUrl.IsNotEmpty() ? Visibility.Visible : Visibility.Hidden;
-                        }
                     }
                 }
             }

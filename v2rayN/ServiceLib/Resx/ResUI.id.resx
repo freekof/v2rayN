@@ -1767,9 +1767,6 @@ Tindakan "Ambil sertifikat" mungkin gagal jika sertifikat self-signed digunakan 
   <data name="MsgNotSupport" xml:space="preserve">
     <value>Tidak didukung</value>
   </data>
-  <data name="LvTestIpInfo" xml:space="preserve">
-    <value>Info IP</value>
-  </data>
   <data name="menuNewUpdate" xml:space="preserve">
     <value>Pembaruan baru</value>
   </data>

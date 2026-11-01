@@ -142,7 +142,6 @@ public static class ConfigHandler
         if (config.SpeedTestItem.IPAPIUrl.IsNullOrEmpty())
         {
             config.SpeedTestItem.IPAPIUrl = Global.IPAPIUrls.First();
-            config.UiItem.HideColumnIpInfo = false;
         }
         config.SpeedTestItem.MixedConcurrencyCount = Math.Max(config.SpeedTestItem.MixedConcurrencyCount, Global.SpeedTestConcurrencyCountMin);
         if (config.SpeedTestItem.UdpTestTarget.IsNullOrEmpty())
@@ -1101,7 +1100,6 @@ public static class ConfigHandler
                               Delay = t33?.Delay ?? 0,
                               Speed = t33?.Speed ?? 0,
                               Sort = t33?.Sort ?? 0,
-                              IpInfo = t33?.IpInfo ?? string.Empty,
                               TodayDown = (t22?.TodayDown ?? 0).ToString("D16"),
                               TodayUp = (t22?.TodayUp ?? 0).ToString("D16"),
                               TotalDown = (t22?.TotalDown ?? 0).ToString("D16"),
@@ -1122,7 +1120,6 @@ public static class ConfigHandler
                 EServerColName.StreamSecurity => lstProfile.OrderBy(t => t.StreamSecurity).ToList(),
                 EServerColName.DelayVal => lstProfile.OrderBy(t => t.Delay).ToList(),
                 EServerColName.SpeedVal => lstProfile.OrderBy(t => t.Speed).ToList(),
-                EServerColName.IpInfo => lstProfile.OrderBy(t => t.IpInfo).ToList(),
                 EServerColName.SubRemarks => lstProfile.OrderBy(t => t.Subid).ToList(),
                 EServerColName.TodayDown => lstProfile.OrderBy(t => t.TodayDown).ToList(),
                 EServerColName.TodayUp => lstProfile.OrderBy(t => t.TodayUp).ToList(),
@@ -1143,7 +1140,6 @@ public static class ConfigHandler
                 EServerColName.StreamSecurity => lstProfile.OrderByDescending(t => t.StreamSecurity).ToList(),
                 EServerColName.DelayVal => lstProfile.OrderByDescending(t => t.Delay).ToList(),
                 EServerColName.SpeedVal => lstProfile.OrderByDescending(t => t.Speed).ToList(),
-                EServerColName.IpInfo => lstProfile.OrderByDescending(t => t.IpInfo).ToList(),
                 EServerColName.SubRemarks => lstProfile.OrderByDescending(t => t.Subid).ToList(),
                 EServerColName.TodayDown => lstProfile.OrderByDescending(t => t.TodayDown).ToList(),
                 EServerColName.TodayUp => lstProfile.OrderByDescending(t => t.TodayUp).ToList(),

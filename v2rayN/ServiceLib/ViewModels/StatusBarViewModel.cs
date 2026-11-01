@@ -219,7 +219,8 @@ public partial class StatusBarViewModel : MyReactiveObject
         await ConfigHandler.InitBuiltinRouting(_config);
         await RefreshRoutingsMenu();
         await InboundDisplayStatus();
-        await ChangeSystemProxyAsync(_config.SystemProxyItem.SysProxyType, true);
+        // The view refreshes its icon on initialization; interaction handlers are not registered yet.
+        await ChangeSystemProxyAsync(_config.SystemProxyItem.SysProxyType, false);
 
         BlRouting = true;
     }
@@ -327,11 +328,6 @@ public partial class StatusBarViewModel : MyReactiveObject
         var result = await Task.Run(ConnectionHandler.RunAvailabilityCheck);
         var msg = string.Format(ResUI.TestMeOutput, result.Time, result.Ip);
 
-        var ip = result.GetValidIp();
-        if (ip.IsNotEmpty())
-        {
-            ProfileExManager.Instance.SetTestIpInfo(item.IndexId, ip);
-        }
         if (result.Time > 0)
         {
             ProfileExManager.Instance.SetTestDelay(item.IndexId, result.Time);

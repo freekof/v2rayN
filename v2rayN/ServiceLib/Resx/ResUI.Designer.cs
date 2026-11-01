@@ -608,17 +608,7 @@ namespace ServiceLib.Resx {
                 return ResourceManager.GetString("LvTestDelay", resourceCulture);
             }
         }
-        
-        /// <summary>
-        ///   查找类似 IP Info 的本地化字符串。
-        /// </summary>
-        public static string LvTestIpInfo {
-            get {
-                return ResourceManager.GetString("LvTestIpInfo", resourceCulture);
-            }
-        }
-        
-        /// <summary>
+/// <summary>
         ///   查找类似 Speed (MB/s) 的本地化字符串。
         /// </summary>
         public static string LvTestSpeed {

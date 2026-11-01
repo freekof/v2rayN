@@ -1761,9 +1761,6 @@ The "Get Certificate" action may fail if a self-signed certificate is used or if
   <data name="MsgNotSupport" xml:space="preserve">
     <value>Non supporté</value>
   </data>
-  <data name="LvTestIpInfo" xml:space="preserve">
-    <value>Détails IP</value>
-  </data>
   <data name="menuNewUpdate" xml:space="preserve">
     <value>Nouvelle MAJ</value>
   </data>
