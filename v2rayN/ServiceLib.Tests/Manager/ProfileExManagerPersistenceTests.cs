@@ -16,7 +16,6 @@ public class ProfileExManagerPersistenceTests
                 manager.SetTestDelay(id, 42);
                 manager.SetTestSpeed(id, 12.5m);
                 manager.SetTestMessage(id, "completed");
-                manager.SetTestIpInfo(id, "192.0.2.1");
                 manager.SetSort(id, 7);
             }
 
@@ -30,7 +29,6 @@ public class ProfileExManagerPersistenceTests
                 await saved[0].Delay.Should().BeEqualTo(42);
                 await saved[0].Speed.Should().BeEqualTo(12.5m);
                 await saved[0].Message.Should().BeEqualTo("completed");
-                await saved[0].IpInfo.Should().BeEqualTo("192.0.2.1");
                 await saved[0].Sort.Should().BeEqualTo(7);
             }
         }
@@ -62,7 +60,6 @@ public class ProfileExManagerPersistenceTests
             manager.SetTestDelay(existingId, 100);
             manager.SetTestSpeed(existingId, 20);
             manager.SetTestDelay(newId, 200);
-            manager.SetTestIpInfo(newId, "192.0.2.2");
 
             await manager.SaveTo();
 
@@ -74,14 +71,12 @@ public class ProfileExManagerPersistenceTests
                 .Where(t => t.IndexId == newId).ToListAsync();
             await inserted.Count.Should().BeEqualTo(1);
             await inserted[0].Delay.Should().BeEqualTo(200);
-            await inserted[0].IpInfo.Should().BeEqualTo("192.0.2.2");
 
             manager.SetTestDelay(newId, 300);
             await manager.SaveTo();
             var updated = await SQLiteHelper.Instance.TableAsync<ProfileExItem>()
                 .Where(t => t.IndexId == newId).FirstAsync();
             await updated.Delay.Should().BeEqualTo(300);
-            await updated.IpInfo.Should().BeEqualTo("192.0.2.2");
         }
         finally
         {

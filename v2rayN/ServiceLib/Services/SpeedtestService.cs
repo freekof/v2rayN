@@ -158,6 +158,7 @@ public class SpeedtestService(Config config, Func<SpeedTestResult, Task> updateF
                 Address = it.Address,
                 Port = it.Port,
                 ConfigType = it.ConfigType,
+                NeedAutoFillRemarks = profile.Remarks.IsNullOrEmpty(),
                 QueueNum = i,
                 Profile = profile,
                 CoreType = AppManager.Instance.GetCoreType(profile, it.ConfigType),
@@ -499,16 +500,6 @@ public class SpeedtestService(Config config, Func<SpeedTestResult, Task> updateF
         ProfileExManager.Instance.SetTestDelay(it.IndexId, responseTime);
         await UpdateFunc(it.IndexId, responseTime.ToString());
 
-        if (responseTime > 0 && _config.SpeedTestItem.IPAPIUrl.IsNotEmpty())
-        {
-            var ipInfo = await ConnectionHandler.GetIPInfo(webProxy, ct);
-            await UpdateAliasFunc(it.IndexId, ipInfo?.ToAliasString());
-        }
-        else
-        {
-            await UpdateAliasFunc(it.IndexId, null);
-        }
-
         completedIds.TryAdd(it.IndexId, 0);
         return responseTime;
     }
@@ -533,7 +524,53 @@ public class SpeedtestService(Config config, Func<SpeedTestResult, Task> updateF
             }
             await UpdateFunc(it.IndexId, "", msg);
         }, linkedCt);
+
+        if (it.NeedAutoFillRemarks && _config.SpeedTestItem.IPAPIUrl.IsNotEmpty())
+        {
+            await TryAutoFillRemarks(it, webProxy, ct);
+        }
+
         completedIds.TryAdd(it.IndexId, 0);
+    }
+
+    private async Task TryAutoFillRemarks(ServerTestItem it, IWebProxy webProxy, CancellationToken ct)
+    {
+        try
+        {
+            if (!it.NeedAutoFillRemarks || it.IndexId.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            var profile = await AppManager.Instance.GetProfileItem(it.IndexId);
+            if (profile is null || profile.Remarks.IsNotEmpty())
+            {
+                it.NeedAutoFillRemarks = false;
+                return;
+            }
+
+            var alias = (await ConnectionHandler.GetIPInfo(webProxy, ct))?.ToAliasString();
+            if (alias.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            profile.Remarks = alias;
+            if (await SQLiteHelper.Instance.UpdateAsync(profile) > 0)
+            {
+                it.Profile.Remarks = alias;
+                it.NeedAutoFillRemarks = false;
+                await UpdateAliasFunc(it.IndexId, alias);
+            }
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            // A cancelled speed test must not fail after its result has been reported.
+        }
+        catch (Exception ex)
+        {
+            Logging.SaveLog(_tag, ex);
+        }
     }
 
     private async Task<int> DoUdpTest(ServerTestItem it,
