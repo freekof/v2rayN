@@ -1563,7 +1563,7 @@
                         Style="{StaticResource DefComboBox}" />
 
                     <TextBlock
-                        Grid.Row="8"
+                        Grid.Row="9"
                         Grid.Column="0"
                         Margin="{StaticResource Margin8}"
                         VerticalAlignment="Center"
@@ -1571,13 +1571,13 @@
                         Text="HTTP/HTTPS" />
                     <ComboBox
                         x:Name="cmbCoreType10"
-                        Grid.Row="8"
+                        Grid.Row="9"
                         Grid.Column="1"
                         Width="200"
                         Margin="{StaticResource Margin8}"
                         Style="{StaticResource DefComboBox}" />
                     <TextBlock
-                        Grid.Row="9"
+                        Grid.Row="8"
                         Grid.Column="0"
                         Margin="{StaticResource Margin8}"
                         VerticalAlignment="Center"
@@ -1585,7 +1585,7 @@
                         Text="MASQUE" />
                     <ComboBox
                         x:Name="cmbCoreType14"
-                        Grid.Row="9"
+                        Grid.Row="8"
                         Grid.Column="1"
                         Width="200"
                         Margin="{StaticResource Margin8}"
