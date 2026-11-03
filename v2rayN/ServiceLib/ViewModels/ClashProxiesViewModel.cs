@@ -364,14 +364,10 @@ public partial class ClashProxiesViewModel : MyReactiveObject
             return;
         }
 
-        var options = new ParallelOptions
-        {
-            MaxDegreeOfParallelism = 4,
-        };
-        await Parallel.ForEachAsync(groupProxy?.all ?? [], options, async (name, _) =>
-        {
-            await TestProxyDelay(name);
-        });
+        var tasks = (groupProxy?.all ?? [])
+            .Select(name => Task.Run(async () => await TestProxyDelay(name)))
+            .ToList();
+        await Task.WhenAll(tasks);
     }
 
     public async Task ProxiesDelayTestResult(SpeedTestResult result)
