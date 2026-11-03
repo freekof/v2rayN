@@ -545,7 +545,7 @@ namespace ServiceLib.Resx {
                 return ResourceManager.GetString("LvPreResolve", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Previous proxy remarks 的本地化字符串。
         /// </summary>
@@ -5209,7 +5209,7 @@ namespace ServiceLib.Resx {
                 return ResourceManager.GetString("TbWarp", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   查找类似 Xray Only 的本地化字符串。
         /// </summary>
