@@ -107,12 +107,12 @@ public class SpeedtestService(Config config, Func<SpeedTestResult, Task> updateF
                     break;
 
                 case ESpeedActionType.Speedtest:
-                    await RunMixedTestAsync(lstSelected, completedIds, 1, true, ct);
+                    await RunMixedTestAsync(lstSelected, completedIds, 1, true, true, ct);
                     break;
 
                 case ESpeedActionType.Mixedtest:
                     await RunMixedTestAsync(lstSelected, completedIds, _config.SpeedTestItem.MixedConcurrencyCount, true,
-                        ct);
+                        false, ct);
                     break;
             }
         }
@@ -276,7 +276,7 @@ public class SpeedtestService(Config config, Func<SpeedTestResult, Task> updateF
             }
             else
             {
-                await RunMixedTestAsync(lstSelected, completedIds, _config.SpeedTestItem.MixedConcurrencyCount, false, ct);
+                await RunMixedTestAsync(lstSelected, completedIds, _config.SpeedTestItem.MixedConcurrencyCount, false, false, ct);
             }
         }
     }
@@ -434,6 +434,7 @@ public class SpeedtestService(Config config, Func<SpeedTestResult, Task> updateF
 
     private async Task RunMixedTestAsync(List<ServerTestItem> selecteds,
         ConcurrentDictionary<string, byte> completedIds, int concurrencyCount, bool blSpeedTest,
+        bool allowAutoFillRemarks,
         CancellationToken ct = default)
     {
         var downloadHandle = new DownloadService();
@@ -465,7 +466,7 @@ public class SpeedtestService(Config config, Func<SpeedTestResult, Task> updateF
                 {
                     if (delay > 0)
                     {
-                        await DoSpeedTest(downloadHandle, it, completedIds, innerCt);
+                        await DoSpeedTest(downloadHandle, it, completedIds, allowAutoFillRemarks, innerCt);
                     }
                     else
                     {
@@ -505,7 +506,8 @@ public class SpeedtestService(Config config, Func<SpeedTestResult, Task> updateF
     }
 
     private async Task DoSpeedTest(DownloadService downloadHandle, ServerTestItem it,
-        ConcurrentDictionary<string, byte> completedIds, CancellationToken ct = default)
+        ConcurrentDictionary<string, byte> completedIds, bool allowAutoFillRemarks,
+        CancellationToken ct = default)
     {
         await UpdateFunc(it.IndexId, "", ResUI.Speedtesting);
 
@@ -525,7 +527,7 @@ public class SpeedtestService(Config config, Func<SpeedTestResult, Task> updateF
             await UpdateFunc(it.IndexId, "", msg);
         }, linkedCt);
 
-        if (it.NeedAutoFillRemarks && _config.SpeedTestItem.IPAPIUrl.IsNotEmpty())
+        if (allowAutoFillRemarks && it.NeedAutoFillRemarks && _config.SpeedTestItem.IPAPIUrl.IsNotEmpty())
         {
             await TryAutoFillRemarks(it, webProxy, ct);
         }
