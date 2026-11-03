@@ -726,7 +726,6 @@ public partial class MainWindowViewModel : MyReactiveObject
                 await ProfilesViewModel.SetSpeedTestResult(new()
                 {
                     IndexId = profileItem.IndexId,
-                    Remarks = result.Ip,
                     Delay = result.Time > 0 ? result.Time.ToString() : null
                 });
             });
