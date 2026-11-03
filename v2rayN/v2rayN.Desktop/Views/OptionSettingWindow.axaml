@@ -1159,13 +1159,26 @@
                     ColumnDefinitions="Auto,Auto"
                     RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
                     <TextBlock
-                        Grid.Row="1"
+                        Grid.Row="0"
                         Grid.Column="0"
                         Margin="{StaticResource Margin4}"
                         VerticalAlignment="Center"
                         Text="VMess" />
                     <ComboBox
                         x:Name="cmbCoreType1"
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Width="200"
+                        Margin="{StaticResource Margin4}" />
+
+                    <TextBlock
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Margin="{StaticResource Margin4}"
+                        VerticalAlignment="Center"
+                        Text="Custom Pre" />
+                    <ComboBox
+                        x:Name="cmbCoreType2"
                         Grid.Row="1"
                         Grid.Column="1"
                         Width="200"
@@ -1176,9 +1189,9 @@
                         Grid.Column="0"
                         Margin="{StaticResource Margin4}"
                         VerticalAlignment="Center"
-                        Text="Custom Pre" />
+                        Text="Shadowsocks" />
                     <ComboBox
-                        x:Name="cmbCoreType2"
+                        x:Name="cmbCoreType3"
                         Grid.Row="2"
                         Grid.Column="1"
                         Width="200"
@@ -1189,9 +1202,9 @@
                         Grid.Column="0"
                         Margin="{StaticResource Margin4}"
                         VerticalAlignment="Center"
-                        Text="Shadowsocks" />
+                        Text="Socks" />
                     <ComboBox
-                        x:Name="cmbCoreType3"
+                        x:Name="cmbCoreType4"
                         Grid.Row="3"
                         Grid.Column="1"
                         Width="200"
@@ -1202,9 +1215,9 @@
                         Grid.Column="0"
                         Margin="{StaticResource Margin4}"
                         VerticalAlignment="Center"
-                        Text="Socks" />
+                        Text="VLESS" />
                     <ComboBox
-                        x:Name="cmbCoreType4"
+                        x:Name="cmbCoreType5"
                         Grid.Row="4"
                         Grid.Column="1"
                         Width="200"
@@ -1215,9 +1228,9 @@
                         Grid.Column="0"
                         Margin="{StaticResource Margin4}"
                         VerticalAlignment="Center"
-                        Text="VLESS" />
+                        Text="Trojan" />
                     <ComboBox
-                        x:Name="cmbCoreType5"
+                        x:Name="cmbCoreType6"
                         Grid.Row="5"
                         Grid.Column="1"
                         Width="200"
@@ -1228,9 +1241,9 @@
                         Grid.Column="0"
                         Margin="{StaticResource Margin4}"
                         VerticalAlignment="Center"
-                        Text="Trojan" />
+                        Text="Hysteria2" />
                     <ComboBox
-                        x:Name="cmbCoreType6"
+                        x:Name="cmbCoreType7"
                         Grid.Row="6"
                         Grid.Column="1"
                         Width="200"
@@ -1241,9 +1254,9 @@
                         Grid.Column="0"
                         Margin="{StaticResource Margin4}"
                         VerticalAlignment="Center"
-                        Text="Hysteria2" />
+                        Text="Wireguard" />
                     <ComboBox
-                        x:Name="cmbCoreType7"
+                        x:Name="cmbCoreType9"
                         Grid.Row="7"
                         Grid.Column="1"
                         Width="200"
@@ -1254,35 +1267,22 @@
                         Grid.Column="0"
                         Margin="{StaticResource Margin4}"
                         VerticalAlignment="Center"
-                        Text="Wireguard" />
+                        Text="HTTP/HTTPS" />
                     <ComboBox
-                        x:Name="cmbCoreType9"
+                        x:Name="cmbCoreType10"
                         Grid.Row="8"
                         Grid.Column="1"
                         Width="200"
                         Margin="{StaticResource Margin4}" />
-
                     <TextBlock
                         Grid.Row="9"
-                        Grid.Column="0"
-                        Margin="{StaticResource Margin4}"
-                        VerticalAlignment="Center"
-                        Text="HTTP/HTTPS" />
-                    <ComboBox
-                        x:Name="cmbCoreType10"
-                        Grid.Row="9"
-                        Grid.Column="1"
-                        Width="200"
-                        Margin="{StaticResource Margin4}" />
-                    <TextBlock
-                        Grid.Row="10"
                         Grid.Column="0"
                         Margin="{StaticResource Margin4}"
                         VerticalAlignment="Center"
                         Text="MASQUE" />
                     <ComboBox
                         x:Name="cmbCoreType14"
-                        Grid.Row="10"
+                        Grid.Row="9"
                         Grid.Column="1"
                         Width="200"
                         Margin="{StaticResource Margin4}" />
