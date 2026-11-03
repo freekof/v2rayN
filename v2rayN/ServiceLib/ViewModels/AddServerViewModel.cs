@@ -110,6 +110,15 @@ public partial class AddServerViewModel : MyReactiveObject, ICloseable
     public partial string MasqueHeaders { get; set; }
 
     [Reactive]
+    public partial string WarpPublicKey { get; set; }
+
+    [Reactive]
+    public partial string WarpPrivateKey { get; set; }
+
+    [Reactive]
+    public partial string WarpAddress { get; set; }
+
+    [Reactive]
     public partial string Network { get; set; }
 
     [Reactive]
@@ -346,6 +355,9 @@ public partial class AddServerViewModel : MyReactiveObject, ICloseable
         GeckoMaxPacketSize = protocolExtra.GeckoMaxPacketSize.ToInt();
         MasquePath = protocolExtra.MasquePath ?? string.Empty;
         MasqueHeaders = protocolExtra.MasqueHeaders ?? string.Empty;
+        WarpPublicKey = protocolExtra.WarpPublicKey ?? string.Empty;
+        WarpPrivateKey = protocolExtra.WarpPrivateKey ?? string.Empty;
+        WarpAddress = protocolExtra.WarpAddress ?? string.Empty;
 
         RawHeaderType = transport.RawHeaderType ?? Global.None;
         Host = transport.Host ?? string.Empty;
@@ -486,6 +498,9 @@ public partial class AddServerViewModel : MyReactiveObject, ICloseable
             GeckoMaxPacketSize = GeckoMaxPacketSize > 0 ? GeckoMaxPacketSize.ToString() : null,
             MasquePath = MasquePath.NullIfEmpty(),
             MasqueHeaders = MasqueHeaders.NullIfEmpty(),
+            WarpPublicKey = WarpPublicKey.NullIfEmpty(),
+            WarpPrivateKey = WarpPrivateKey.NullIfEmpty(),
+            WarpAddress = WarpAddress.NullIfEmpty(),
         });
         SelectedSource.SetTransportExtra(transport);
 
