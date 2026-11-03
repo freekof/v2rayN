@@ -2,8 +2,10 @@ namespace ServiceLib.ViewModels;
 
 public partial class ClashProxiesViewModel : MyReactiveObject
 {
+    private const string _tag = "ClashProxiesViewModel";
     private const int _delayTimeout = 99999999;
     private ClashItem _clashItem = new();
+    private int _isDelayTesting;
 
     public ClashProxiesViewModel()
     {
@@ -97,8 +99,37 @@ public partial class ClashProxiesViewModel : MyReactiveObject
 
     public async Task ProxiesReload()
     {
-        await GetClashProxies();
-        await GetClashModes();
+        try
+        {
+            await GetClashProxies();
+            await GetClashModes();
+        }
+        catch (Exception ex)
+        {
+            Logging.SaveLog(_tag, ex);
+            return;
+        }
+
+        if (Interlocked.CompareExchange(ref _isDelayTesting, 1, 0) != 0)
+        {
+            return;
+        }
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await TestAllProxiesDelay();
+                await GetClashProxies();
+            }
+            catch (Exception ex)
+            {
+                Logging.SaveLog(_tag, ex);
+            }
+            finally
+            {
+                Interlocked.Exchange(ref _isDelayTesting, 0);
+            }
+        });
     }
 
     #region task
@@ -158,7 +189,23 @@ public partial class ClashProxiesViewModel : MyReactiveObject
         }
         _clashItem = ret;
 
-        RxSchedulers.MainThreadScheduler.Schedule(() => _ = RefreshProxyGroups());
+        var refreshed = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        RxSchedulers.MainThreadScheduler.Schedule(async () =>
+        {
+            try
+            {
+                await RefreshProxyGroups();
+            }
+            catch (Exception ex)
+            {
+                Logging.SaveLog(_tag, ex);
+            }
+            finally
+            {
+                refreshed.TrySetResult();
+            }
+        });
+        await refreshed.Task;
     }
 
     public async Task RefreshProxyGroups()
@@ -368,6 +415,24 @@ public partial class ClashProxiesViewModel : MyReactiveObject
             .Select(name => Task.Run(async () => await TestProxyDelay(name)))
             .ToList();
         await Task.WhenAll(tasks);
+    }
+
+    private async Task TestAllProxiesDelay()
+    {
+        var names = _clashItem.Proxies
+            .Where(kv => kv.Key.IsNotEmpty()
+                         && !Global.notAllowTestType.Contains(kv.Value.type?.ToLower()))
+            .Select(kv => kv.Key)
+            .ToList();
+
+        var options = new ParallelOptions
+        {
+            MaxDegreeOfParallelism = 8,
+        };
+        await Parallel.ForEachAsync(names, options, async (name, _) =>
+        {
+            await TestProxyDelay(name);
+        });
     }
 
     public async Task ProxiesDelayTestResult(SpeedTestResult result)
