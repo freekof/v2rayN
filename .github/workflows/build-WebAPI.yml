@@ -48,7 +48,7 @@ permissions:
 jobs:
   macos:
     name: macOS WebAPI and ServiceLib tests
-    runs-on: macos-latest
+    runs-on: macos-26-intel
     timeout-minutes: 15
     env:
       TUNIT_MAX_PARALLEL_TESTS: 1
