@@ -25,6 +25,41 @@ public class CoreConfigSingboxServiceTests
     }
 
     [Test]
+    public async Task GenerateClientConfigContent_VlessWebSocket_ShouldSerializeRuntimeTransportType()
+    {
+        var config = CoreConfigTestFactory.CreateConfig(ECoreType.sing_box);
+        CoreConfigTestFactory.BindAppManagerConfig(config);
+        var node = new ProfileItem
+        {
+            IndexId = "vless-ws",
+            ConfigType = EConfigType.VLESS,
+            CoreType = ECoreType.sing_box,
+            Address = "example.com",
+            Port = 443,
+            Password = "01234567-89ab-cdef-0123-456789abcdef",
+            Network = nameof(ETransport.ws),
+        };
+        node.SetProtocolExtra(new ProtocolExtraItem { VlessEncryption = Global.None });
+        node.SetTransportExtra(new TransportExtraItem
+        {
+            Host = "cdn.example.com",
+            Path = "/vless",
+        });
+        var context = CoreConfigTestFactory.CreateContext(config, node, ECoreType.sing_box);
+
+        var result = new CoreConfigSingboxService(context).GenerateClientConfigContent();
+
+        await result.Success.Should().BeTrue().Because($"ret msg: {result.Msg}");
+        var json = result.Data!.ToString();
+        await (json.Length > 0).Should().BeTrue();
+        var root = JsonUtils.ParseJson(json)!;
+        var outbound = root["outbounds"]!.AsArray()
+            .First(item => item!["tag"]!.GetValue<string>() == Global.ProxyTag)!;
+        await outbound["transport"]!["type"]!.GetValue<string>().Should().BeEqualTo("ws");
+        await outbound["transport"]!["path"]!.GetValue<string>().Should().BeEqualTo("/vless");
+    }
+
+    [Test]
     public async Task GenerateClientConfigContent_TunWithLoopbackPreSocks_ShouldKeepMixedInbound()
     {
         var config = CoreConfigTestFactory.CreateConfig(ECoreType.sing_box);

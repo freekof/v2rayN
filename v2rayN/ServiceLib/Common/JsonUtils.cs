@@ -235,6 +235,7 @@ public class JsonUtils
 [JsonSerializable(typeof(List<Endpoints4Sbox>))]
 [JsonSerializable(typeof(Outbound4Sbox))]
 [JsonSerializable(typeof(List<Outbound4Sbox>))]
+[JsonSerializable(typeof(Transport4Sbox))]
 [JsonSerializable(typeof(Rule4Sbox))]
 [JsonSerializable(typeof(Ruleset4Sbox))]
 [JsonSerializable(typeof(List<Rule4Sbox>))]
